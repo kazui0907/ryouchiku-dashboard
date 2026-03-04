@@ -167,7 +167,10 @@ export async function POST(request: Request) {
       lineItemCount++;
     });
 
-    await Promise.all(lineItemOps);
+    const batchSize = 5;
+    for (let i = 0; i < lineItemOps.length; i += batchSize) {
+      await Promise.all(lineItemOps.slice(i, i + batchSize));
+    }
 
     return NextResponse.json({
       success: true,
