@@ -28,7 +28,7 @@ export function MonthlyTrendChart({ data }: Props) {
         <XAxis dataKey="name" />
         <YAxis tickFormatter={(value) => formatCompactCurrency(value)} />
         <Tooltip
-          formatter={(value: number) => formatCompactCurrency(value)}
+          formatter={(value) => formatCompactCurrency(value as number)}
           labelStyle={{ color: '#000' }}
         />
         <Legend />

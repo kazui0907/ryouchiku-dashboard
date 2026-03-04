@@ -26,14 +26,17 @@ interface WeekData {
   actual: string;
 }
 
+interface WeeksData {
+  [key: string]: WeekData;
+  week1: WeekData;
+  week2: WeekData;
+  week3: WeekData;
+  week4: WeekData;
+  week5: WeekData;
+}
+
 interface KPIData {
-  [itemName: string]: {
-    week1: WeekData;
-    week2: WeekData;
-    week3: WeekData;
-    week4: WeekData;
-    week5: WeekData;
-  };
+  [itemName: string]: WeeksData;
 }
 
 export default function WeeklyKPIInputPage() {
@@ -70,7 +73,7 @@ export default function WeeklyKPIInputPage() {
         data.items.forEach((item: any) => {
           if (formattedData[item.itemName]) {
             for (let w = 1; w <= 5; w++) {
-              const weekKey = `week${w}` as keyof typeof item;
+              const weekKey = `week${w}`;
               formattedData[item.itemName][weekKey] = {
                 target: item[`week${w}Target`]?.toString() || '',
                 actual: item[`week${w}Actual`]?.toString() || '',

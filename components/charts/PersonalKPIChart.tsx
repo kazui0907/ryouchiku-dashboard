@@ -29,11 +29,12 @@ export function PersonalKPIChart({ data }: Props) {
         <XAxis dataKey="name" />
         <YAxis tickFormatter={(value) => formatCompactCurrency(value)} />
         <Tooltip
-          formatter={(value: number, name: string) => {
+          formatter={(value, name) => {
+            const numValue = value as number;
             if (name === '達成率') {
-              return `${value.toFixed(1)}%`;
+              return `${numValue.toFixed(1)}%`;
             }
-            return formatCompactCurrency(value);
+            return formatCompactCurrency(numValue);
           }}
         />
         <Legend />

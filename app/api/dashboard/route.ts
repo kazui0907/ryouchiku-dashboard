@@ -65,18 +65,30 @@ export async function GET(request: Request) {
     // 当月の週次KPI
     const weeklyKPIs = await prisma.weeklyKPI.findMany({
       where: { year, month },
-      orderBy: { weekNumber: 'asc' },
+      orderBy: { itemName: 'asc' },
     });
 
-    // 週次KPIの累計
+    // 週次KPIの累計（week1〜week5のActualを合算）
     const weeklyTotals = weeklyKPIs.reduce(
-      (acc, kpi) => ({
-        inquiryCount: acc.inquiryCount + kpi.inquiryCount,
-        inquiryTarget: acc.inquiryTarget + kpi.inquiryTarget,
-        orderCount: acc.orderCount + (kpi.orderCount || 0),
-        orderTarget: acc.orderTarget + (kpi.orderTarget || 0),
-      }),
-      { inquiryCount: 0, inquiryTarget: 0, orderCount: 0, orderTarget: 0 }
+      (acc, kpi) => {
+        const actualSum =
+          (kpi.week1Actual || 0) +
+          (kpi.week2Actual || 0) +
+          (kpi.week3Actual || 0) +
+          (kpi.week4Actual || 0) +
+          (kpi.week5Actual || 0);
+        const targetSum =
+          (kpi.week1Target || 0) +
+          (kpi.week2Target || 0) +
+          (kpi.week3Target || 0) +
+          (kpi.week4Target || 0) +
+          (kpi.week5Target || 0);
+        return {
+          totalActual: acc.totalActual + actualSum,
+          totalTarget: acc.totalTarget + targetSum,
+        };
+      },
+      { totalActual: 0, totalTarget: 0 }
     );
 
     // 月次推移データ (過去12ヶ月)

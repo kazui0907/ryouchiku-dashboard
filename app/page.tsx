@@ -79,10 +79,8 @@ interface DashboardData {
     orderTarget: number | null;
   }>;
   weeklyTotals: {
-    inquiryCount: number;
-    inquiryTarget: number;
-    orderCount: number;
-    orderTarget: number;
+    totalActual: number;
+    totalTarget: number;
   };
   monthlyTrend: Array<{
     year: number;
@@ -143,12 +141,45 @@ export default function Dashboard() {
   }
 
   const hasAccountingData = data && data.currentMonth;
-  const { currentMonth, prevMonth, ytd, weeklyKPIs, weeklyTotals } = data || {
-    currentMonth: null,
+  const { prevMonth, weeklyKPIs, weeklyTotals } = data || {
     prevMonth: null,
-    ytd: null,
     weeklyKPIs: [],
-    weeklyTotals: { inquiryCount: 0, inquiryTarget: 0, orderCount: 0, orderTarget: 0 }
+    weeklyTotals: { totalActual: 0, totalTarget: 0 }
+  };
+
+  // ytdのデフォルト値
+  const ytd = data?.ytd ?? {
+    salesRevenue: 0,
+    grossProfit: 0,
+    marginProfit: 0,
+    operatingProfit: 0,
+    budgetSales: 0,
+    budgetGrossProfit: 0,
+    budgetMarginProfit: 0,
+    budgetOperatingProfit: 0,
+    lastYearSalesRevenue: 0,
+    lastYearGrossProfit: 0,
+    lastYearMarginProfit: 0,
+    lastYearOperatingProfit: 0,
+  };
+
+  // currentMonthがnullの場合のデフォルト値
+  const currentMonth = data?.currentMonth ?? {
+    salesRevenue: 0,
+    grossProfit: 0,
+    grossProfitRate: 0,
+    costOfSales: 0,
+    marginProfit: null,
+    marginProfitRate: null,
+    operatingProfit: null,
+    budgetSales: null,
+    budgetGrossProfit: null,
+    budgetMarginProfit: null,
+    budgetOperatingProfit: null,
+    lastYearSalesRevenue: null,
+    lastYearGrossProfit: null,
+    lastYearMarginProfit: null,
+    lastYearOperatingProfit: null,
   };
 
   // 前月比の計算（管理会計データがある場合のみ）
@@ -165,11 +196,10 @@ export default function Dashboard() {
     : 0;
 
   // 週次KPIの達成率
-  const inquiryAchievementRate =
-    weeklyTotals.inquiryTarget > 0 ? weeklyTotals.inquiryCount / weeklyTotals.inquiryTarget : 0;
-
-  const orderAchievementRate =
-    weeklyTotals.orderTarget > 0 ? weeklyTotals.orderCount / weeklyTotals.orderTarget : 0;
+  const kpiAchievementRate =
+    weeklyTotals?.totalTarget && weeklyTotals.totalTarget > 0
+      ? weeklyTotals.totalActual / weeklyTotals.totalTarget
+      : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
