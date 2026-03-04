@@ -171,6 +171,22 @@ model PersonalKPI {
   @@index([year, month, employeeId])
 }
 
+// 管理会計 明細行（accounting-full用）
+model AccountingLineItem {
+  id          String   @id @default(cuid())
+  year        Int
+  rowIndex    Int
+  category    String
+  subcategory String
+  monthsJson  String   // JSON: [{month, lastYear, budget, actual}, ...]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([year, rowIndex])
+  @@index([year])
+}
+
 // 予算データ
 model Budget {
   id                String   @id @default(cuid())

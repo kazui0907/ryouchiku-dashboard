@@ -11,7 +11,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ファイルが選択されていません' }, { status: 400 });
     }
 
-    // CSVファイルを読み込む
     const text = await file.text();
     const records = parse(text, {
       columns: false,
@@ -24,21 +23,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'CSVファイルが空です' }, { status: 400 });
     }
 
-    // ヘッダー行を取得 (1月, 2月, ...)
-    const headers = records[0];
-    const months = headers.slice(3).filter((h: string) => h && h.match(/^\d+月$/));
+    const year = 2026;
 
-    if (months.length === 0) {
-      return NextResponse.json(
-        { error: '月のデータが見つかりません' },
-        { status: 400 }
-      );
+    // 月ごとのカラム位置（各月5列: 昨年実績, 予定数字, 実数, 昨年対比, 達成率）
+    const monthColumns: { [month: number]: { lastYear: number; budget: number; actual: number } } = {};
+    for (let month = 1; month <= 12; month++) {
+      const baseCol = 3 + (month - 1) * 5;
+      monthColumns[month] = {
+        lastYear: baseCol,
+        budget: baseCol + 1,
+        actual: baseCol + 2,
+      };
     }
 
+    // ── 1. MonthlyAccounting（集計データ）の保存 ──
     let importCount = 0;
-
-    // データを月ごとに処理
-    for (let monthIdx = 0; monthIdx < months.length; monthIdx++) {
+    for (let monthIdx = 0; monthIdx < 12; monthIdx++) {
       const month = monthIdx + 1;
       const colIdx = monthIdx + 3;
 
@@ -48,53 +48,95 @@ export async function POST(request: Request) {
       let grossProfit = 0;
 
       for (const record of records) {
-        const label = record[1]; // 勘定科目
+        const label = record[1];
         if (!label) continue;
-
         const value = record[colIdx];
         if (!value || value === '') continue;
 
-        if (label.includes('売上高合計')) {
-          salesRevenue = parseAmount(value);
-        } else if (label === '売上値引・返品') {
-          salesDiscount = parseAmount(value);
-        } else if (label.includes('売上原価合計')) {
-          costOfSales = parseAmount(value);
-        } else if (label.includes('売上総利益')) {
-          grossProfit = parseAmount(value);
-        }
+        if (label.includes('売上高合計')) salesRevenue = parseAmount(value);
+        else if (label === '売上値引・返品') salesDiscount = parseAmount(value);
+        else if (label.includes('売上原価合計')) costOfSales = parseAmount(value);
+        else if (label.includes('売上総利益')) grossProfit = parseAmount(value);
       }
 
       if (salesRevenue > 0) {
         const grossProfitRate = grossProfit / salesRevenue;
-
         await prisma.monthlyAccounting.upsert({
-          where: { year_month: { year: 2026, month } },
-          update: {
-            salesRevenue,
-            salesDiscount,
-            costOfSales,
-            grossProfit,
-            grossProfitRate,
-          },
-          create: {
-            year: 2026,
-            month,
-            salesRevenue,
-            salesDiscount,
-            costOfSales,
-            grossProfit,
-            grossProfitRate,
-          },
+          where: { year_month: { year, month } },
+          update: { salesRevenue, salesDiscount, costOfSales, grossProfit, grossProfitRate },
+          create: { year, month, salesRevenue, salesDiscount, costOfSales, grossProfit, grossProfitRate },
         });
-
         importCount++;
       }
     }
 
+    // ── 2. AccountingLineItem（明細行）の保存 ──
+    let lineItemCount = 0;
+    const lineItemOps: Promise<unknown>[] = [];
+
+    records.forEach((row: string[], index: number) => {
+      if (index < 2) return;
+      if (index >= 103) return;
+
+      const rowLabel = row[0]?.trim() || '';
+      const category = row[1]?.trim() || '';
+      let subcategory = row[2]?.trim() || '';
+
+      if (subcategory === 'a') subcategory = '';
+      if (category === 'a') return;
+
+      let displayCategory = '';
+      let displaySubcategory = '';
+
+      if (category) {
+        displayCategory = category;
+        displaySubcategory = subcategory;
+      } else if (subcategory) {
+        displayCategory = '';
+        displaySubcategory = subcategory;
+      } else if (rowLabel) {
+        displayCategory = rowLabel;
+        displaySubcategory = '';
+      } else {
+        return;
+      }
+
+      const months = [];
+      for (let month = 1; month <= 12; month++) {
+        const cols = monthColumns[month];
+        months.push({
+          month,
+          lastYear: parseAmountNullable(row[cols.lastYear]),
+          budget: parseAmountNullable(row[cols.budget]),
+          actual: parseAmountNullable(row[cols.actual]),
+        });
+      }
+
+      lineItemOps.push(
+        prisma.accountingLineItem.upsert({
+          where: { year_rowIndex: { year, rowIndex: index } },
+          update: {
+            category: displayCategory,
+            subcategory: displaySubcategory,
+            monthsJson: JSON.stringify(months),
+          },
+          create: {
+            year,
+            rowIndex: index,
+            category: displayCategory,
+            subcategory: displaySubcategory,
+            monthsJson: JSON.stringify(months),
+          },
+        })
+      );
+      lineItemCount++;
+    });
+
+    await Promise.all(lineItemOps);
+
     return NextResponse.json({
       success: true,
-      message: `${importCount}ヶ月分のデータをインポートしました`,
+      message: `${importCount}ヶ月分の集計データと${lineItemCount}行の明細データをインポートしました`,
     });
   } catch (error) {
     console.error('Upload API Error:', error);
@@ -105,16 +147,20 @@ export async function POST(request: Request) {
   }
 }
 
-// 金額文字列をパース
 function parseAmount(value: string): number {
   if (!value || value === '' || value === '#DIV/0!' || value === '#VALUE!') return 0;
-
-  // 科学的記数法のチェック
-  if (value.includes('E+') || value.includes('e+')) {
-    return parseFloat(value);
+  if (value.includes('E+') || value.includes('e+')) return parseFloat(value);
+  if (value.trim().startsWith('(') && value.trim().endsWith(')')) {
+    const cleaned = value.replace(/[()¥,\s円]/g, '').replace(/["']/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : -num;
   }
-
   const cleaned = value.replace(/[¥,\s円]/g, '');
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : num;
+}
+
+function parseAmountNullable(value: string): number | null {
+  if (!value || value.trim() === '' || value === '-') return null;
+  return parseAmount(value);
 }
