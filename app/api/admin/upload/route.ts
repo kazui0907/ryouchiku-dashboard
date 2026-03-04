@@ -174,9 +174,10 @@ export async function POST(request: Request) {
       message: `${importCount}ヶ月分の集計データと${lineItemCount}行の明細データをインポートしました`,
     });
   } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
     console.error('Upload API Error:', error);
     return NextResponse.json(
-      { error: 'アップロード処理に失敗しました' },
+      { error: 'アップロード処理に失敗しました', detail: msg },
       { status: 500 }
     );
   }
