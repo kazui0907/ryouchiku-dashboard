@@ -55,20 +55,22 @@ export async function POST(request: Request) {
       let lastYearGrossProfit: number | null = null;
       let lastYearMarginProfit: number | null = null;
 
+      let costOfSalesDone = false;
       for (const record of records) {
-        const label = record[1];
+        const label = (record[0]?.trim() || record[1]?.trim() || '');
         if (!label) continue;
 
-        if (label.includes('売上高合計')) {
+        if (label === '売上高合計') {
           salesRevenue = parseAmount(record[cols.actual]);
           budgetSales = parseAmountNullable(record[cols.budget]);
           lastYearSalesRevenue = parseAmountNullable(record[cols.lastYear]);
         } else if (label === '売上値引・返品') {
           salesDiscount = parseAmount(record[cols.actual]);
-        } else if (label.includes('売上原価合計')) {
+        } else if (label === '売上原価' && !costOfSalesDone) {
           costOfSales = parseAmount(record[cols.actual]);
           lastYearCostOfSales = parseAmountNullable(record[cols.lastYear]);
-        } else if (label.includes('売上総利益') && !label.includes('率')) {
+          costOfSalesDone = true;
+        } else if (label === '売上総利益') {
           grossProfit = parseAmount(record[cols.actual]);
           budgetGrossProfit = parseAmountNullable(record[cols.budget]);
           lastYearGrossProfit = parseAmountNullable(record[cols.lastYear]);
