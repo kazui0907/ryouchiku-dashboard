@@ -178,9 +178,16 @@ export async function POST(request: Request) {
     // 全操作を1トランザクションで実行（接続1本のみ使用）
     await prisma.$transaction(txOps, { timeout: 50000 });
 
+    // デバッグ: 1月の営業利益を確認
+    const debugMonth1 = await prisma.monthlyAccounting.findUnique({
+      where: { year_month: { year, month: 1 } },
+      select: { operatingProfit: true, budgetOperatingProfit: true, marginProfit: true },
+    });
+
     return NextResponse.json({
       success: true,
       message: `${importCount}ヶ月分の集計データと${lineItemCount}行の明細データをインポートしました`,
+      debug: debugMonth1,
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
