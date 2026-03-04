@@ -107,18 +107,16 @@ export async function POST(request: Request) {
 
     // ── 2. AccountingLineItem（明細行）の保存 ──
     let lineItemCount = 0;
-    const lineItemOps: Promise<unknown>[] = [];
 
-    records.forEach((row: string[], index: number) => {
-      if (index < 2) return;
-      if (index >= 103) return;
+    for (let index = 2; index < Math.min(records.length, 103); index++) {
+      const row = records[index] as string[];
 
       const rowLabel = row[0]?.trim() || '';
       const category = row[1]?.trim() || '';
       let subcategory = row[2]?.trim() || '';
 
       if (subcategory === 'a') subcategory = '';
-      if (category === 'a') return;
+      if (category === 'a') continue;
 
       let displayCategory = '';
       let displaySubcategory = '';
@@ -133,7 +131,7 @@ export async function POST(request: Request) {
         displayCategory = rowLabel;
         displaySubcategory = '';
       } else {
-        return;
+        continue;
       }
 
       const months = [];
@@ -147,29 +145,22 @@ export async function POST(request: Request) {
         });
       }
 
-      lineItemOps.push(
-        prisma.accountingLineItem.upsert({
-          where: { year_rowIndex: { year, rowIndex: index } },
-          update: {
-            category: displayCategory,
-            subcategory: displaySubcategory,
-            monthsJson: JSON.stringify(months),
-          },
-          create: {
-            year,
-            rowIndex: index,
-            category: displayCategory,
-            subcategory: displaySubcategory,
-            monthsJson: JSON.stringify(months),
-          },
-        })
-      );
+      await prisma.accountingLineItem.upsert({
+        where: { year_rowIndex: { year, rowIndex: index } },
+        update: {
+          category: displayCategory,
+          subcategory: displaySubcategory,
+          monthsJson: JSON.stringify(months),
+        },
+        create: {
+          year,
+          rowIndex: index,
+          category: displayCategory,
+          subcategory: displaySubcategory,
+          monthsJson: JSON.stringify(months),
+        },
+      });
       lineItemCount++;
-    });
-
-    const batchSize = 5;
-    for (let i = 0; i < lineItemOps.length; i += batchSize) {
-      await Promise.all(lineItemOps.slice(i, i + batchSize));
     }
 
     return NextResponse.json({
