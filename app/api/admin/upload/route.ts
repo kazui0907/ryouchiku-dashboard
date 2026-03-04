@@ -38,33 +38,66 @@ export async function POST(request: Request) {
 
     // ── 1. MonthlyAccounting（集計データ）の保存 ──
     let importCount = 0;
-    for (let monthIdx = 0; monthIdx < 12; monthIdx++) {
-      const month = monthIdx + 1;
-      const colIdx = monthIdx + 3;
+    for (let month = 1; month <= 12; month++) {
+      const cols = monthColumns[month];
 
       let salesRevenue = 0;
       let salesDiscount = 0;
       let costOfSales = 0;
       let grossProfit = 0;
+      let marginProfit: number | null = null;
+      let marginProfitRate: number | null = null;
+      let budgetSales: number | null = null;
+      let budgetGrossProfit: number | null = null;
+      let budgetMarginProfit: number | null = null;
+      let lastYearSalesRevenue: number | null = null;
+      let lastYearCostOfSales: number | null = null;
+      let lastYearGrossProfit: number | null = null;
+      let lastYearMarginProfit: number | null = null;
 
       for (const record of records) {
         const label = record[1];
         if (!label) continue;
-        const value = record[colIdx];
-        if (!value || value === '') continue;
 
-        if (label.includes('売上高合計')) salesRevenue = parseAmount(value);
-        else if (label === '売上値引・返品') salesDiscount = parseAmount(value);
-        else if (label.includes('売上原価合計')) costOfSales = parseAmount(value);
-        else if (label.includes('売上総利益')) grossProfit = parseAmount(value);
+        if (label.includes('売上高合計')) {
+          salesRevenue = parseAmount(record[cols.actual]);
+          budgetSales = parseAmountNullable(record[cols.budget]);
+          lastYearSalesRevenue = parseAmountNullable(record[cols.lastYear]);
+        } else if (label === '売上値引・返品') {
+          salesDiscount = parseAmount(record[cols.actual]);
+        } else if (label.includes('売上原価合計')) {
+          costOfSales = parseAmount(record[cols.actual]);
+          lastYearCostOfSales = parseAmountNullable(record[cols.lastYear]);
+        } else if (label.includes('売上総利益') && !label.includes('率')) {
+          grossProfit = parseAmount(record[cols.actual]);
+          budgetGrossProfit = parseAmountNullable(record[cols.budget]);
+          lastYearGrossProfit = parseAmountNullable(record[cols.lastYear]);
+        } else if (label === '限界利益') {
+          marginProfit = parseAmountNullable(record[cols.actual]);
+          budgetMarginProfit = parseAmountNullable(record[cols.budget]);
+          lastYearMarginProfit = parseAmountNullable(record[cols.lastYear]);
+        } else if (label === '限界利益率') {
+          marginProfitRate = parseAmountNullable(record[cols.actual]);
+        }
       }
 
-      if (salesRevenue > 0) {
-        const grossProfitRate = grossProfit / salesRevenue;
+      if (salesRevenue > 0 || budgetSales !== null) {
+        const grossProfitRate = salesRevenue > 0 ? grossProfit / salesRevenue : 0;
         await prisma.monthlyAccounting.upsert({
           where: { year_month: { year, month } },
-          update: { salesRevenue, salesDiscount, costOfSales, grossProfit, grossProfitRate },
-          create: { year, month, salesRevenue, salesDiscount, costOfSales, grossProfit, grossProfitRate },
+          update: {
+            salesRevenue, salesDiscount, costOfSales, grossProfit, grossProfitRate,
+            marginProfit, marginProfitRate,
+            budgetSales, budgetGrossProfit, budgetMarginProfit,
+            lastYearSalesRevenue, lastYearCostOfSales, lastYearGrossProfit, lastYearMarginProfit,
+          },
+          create: {
+            year, month,
+            salesRevenue, salesDiscount, costOfSales, grossProfit, grossProfitRate,
+            marginProfit, marginProfitRate,
+            budgetSales, budgetGrossProfit, budgetMarginProfit,
+            lastYearSalesRevenue, lastYearCostOfSales, lastYearGrossProfit, lastYearMarginProfit,
+          },
         });
         importCount++;
       }
