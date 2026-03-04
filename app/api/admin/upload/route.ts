@@ -187,7 +187,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: `${importCount}ヶ月分の集計データと${lineItemCount}行の明細データをインポートしました`,
-      debug: debugMonth1,
+      debug: { ...debugMonth1, deployCheck: 'v2' },
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
