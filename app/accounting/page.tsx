@@ -153,18 +153,18 @@ export default function AccountingPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
         <div className="max-w-[1800px] mx-auto">
           {/* ヘッダー */}
           <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-gray-900">月次会計一覧（全項目）</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-900">月次会計一覧（全項目）</h1>
               <div className="flex items-center gap-4">
                 <label className="text-sm font-medium text-gray-700">年度:</label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value={2024}>2024年</option>
                   <option value={2025}>2025年</option>

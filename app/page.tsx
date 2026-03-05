@@ -209,16 +209,16 @@ export default function Dashboard() {
       <Navbar />
       {/* ヘッダー */}
       <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">ライフタイムサポート経営ダッシュボード</h1>
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-900">経営ダッシュボード</h1>
               <p className="mt-1 text-sm text-gray-500">
                 選択中: {selectedYear}年{selectedMonth}月
               </p>
             </div>
             {/* 月選択 */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
                 <label htmlFor="year-select" className="text-sm font-medium text-gray-700">
                   年:
@@ -227,7 +227,7 @@ export default function Dashboard() {
                   id="year-select"
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
+                  className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-2 py-2 border"
                 >
                   {[2022, 2023, 2024, 2025, 2026, 2027].map((year) => (
                     <option key={year} value={year}>
@@ -244,7 +244,7 @@ export default function Dashboard() {
                   id="month-select"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                  className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
+                  className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-2 py-2 border"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                     <option key={month} value={month}>
@@ -258,7 +258,7 @@ export default function Dashboard() {
                   setSelectedYear(currentDate.getFullYear());
                   setSelectedMonth(currentDate.getMonth() + 1);
                 }}
-                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md hover:bg-blue-50"
+                className="px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md hover:bg-blue-50 whitespace-nowrap"
               >
                 今月に戻る
               </button>
@@ -282,7 +282,7 @@ export default function Dashboard() {
 
         {/* 期間選択 */}
         {hasAccountingData && (
-          <div className="flex items-center gap-3 mb-4 bg-white border border-gray-200 rounded-lg px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 bg-white border border-gray-200 rounded-lg px-4 py-3">
             <span className="text-sm font-medium text-gray-700">累計期間:</span>
             <select
               value={fromMonth}

@@ -44,7 +44,7 @@ export default function SyncPage() {
             <ArrowLeft className="h-5 w-5 mr-2" />
             戻る
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">Google Sheets 同期</h1>
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900">Google Sheets 同期</h1>
           <p className="mt-1 text-sm text-gray-500">
             スプレッドシートからデータを自動的に取得して更新します
           </p>

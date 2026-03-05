@@ -215,7 +215,7 @@ export default function WeeklySiteKPIInputPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
@@ -224,13 +224,13 @@ export default function WeeklySiteKPIInputPage() {
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 戻る
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">週次現場KPI入力</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">週次現場KPI入力</h1>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
               >
                 <option value={2024}>2024年</option>
                 <option value={2025}>2025年</option>
@@ -239,7 +239,7 @@ export default function WeeklySiteKPIInputPage() {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
               >
                 {Array.from({ length: 12 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>
@@ -250,7 +250,7 @@ export default function WeeklySiteKPIInputPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 text-sm"
               >
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? '保存中...' : '保存'}
