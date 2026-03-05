@@ -323,11 +323,11 @@ export default function WeeklySiteKPIInputPage() {
                               const weekData = kpiData[key]?.[weekKey];
                               return (
                                 <td key={week} className="px-2 py-2 border-r border-gray-200">
-                                  {weekData?.target !== undefined && weekData.target !== '' && (
-                                    <div className="text-xs text-gray-400 text-center mb-1">
-                                      目標: {weekData.target}{isPercentItem(subItem) ? '%' : ''}
-                                    </div>
-                                  )}
+                                  <div className="text-xs text-gray-400 text-center mb-1">
+                                    目標: {weekData?.target !== '' && weekData?.target !== undefined
+                                      ? `${weekData.target}${isPercentItem(subItem) ? '%' : ''}`
+                                      : '—'}
+                                  </div>
                                   <div className="relative flex items-center">
                                     <input
                                       type="number"
