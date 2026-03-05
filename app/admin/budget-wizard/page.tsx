@@ -141,7 +141,7 @@ export default function BudgetWizardPage() {
 
       const historicalMonthly: any[] = data.historicalMonthly || [];
 
-      // 月ごとに過去データの平均値を集計
+      // 月ごとに過去データの平均売上を集計
       const monthSum: Record<number, { sales: number; count: number }> = {};
       for (let m = 1; m <= 12; m++) monthSum[m] = { sales: 0, count: 0 };
 
@@ -153,26 +153,17 @@ export default function BudgetWizardPage() {
         }
       }
 
-      // データがある月の平均売上を計算。ない月はデータがある月の平均で補完
-      const monthAvgSales: number[] = Array(12).fill(0);
-      const availableAvg = (() => {
-        const counts = Object.values(monthSum).filter((v) => v.count > 0);
-        if (counts.length === 0) return 0;
-        return counts.reduce((s, v) => s + v.sales / v.count, 0) / counts.length;
-      })();
+      // 12ヶ月すべてにデータがある場合のみ過去比率を使用、それ以外は均等割
+      const hasAllMonths = MONTHS.every((m) => monthSum[m].count > 0);
 
-      for (let m = 1; m <= 12; m++) {
-        monthAvgSales[m - 1] =
-          monthSum[m].count > 0
-            ? monthSum[m].sales / monthSum[m].count
-            : availableAvg || 1; // 全データなければ均等割のため1をセット
+      let salesRatios: number[];
+      if (hasAllMonths) {
+        const monthAvgSales = MONTHS.map((m) => monthSum[m].sales / monthSum[m].count);
+        const total = monthAvgSales.reduce((s, v) => s + v, 0);
+        salesRatios = monthAvgSales.map((v) => (total > 0 ? v / total : 1 / 12));
+      } else {
+        salesRatios = Array(12).fill(1 / 12);
       }
-
-      // 合計で割って比率を正規化（必ず12ヶ月で合計=1になる）
-      const totalAvgSales = monthAvgSales.reduce((s, v) => s + v, 0);
-      const salesRatios = monthAvgSales.map((v) =>
-        totalAvgSales > 0 ? v / totalAvgSales : 1 / 12
-      );
 
       const gp = parseInput(annualTargets.grossProfit);
       const mp = parseInput(annualTargets.marginProfit);
