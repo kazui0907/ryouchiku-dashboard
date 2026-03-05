@@ -45,6 +45,12 @@ const SITE_KPI_STRUCTURE = [
   },
 ];
 
+// ％表記の項目かどうか（subItem名で判定）
+const isPercentItem = (subItem: string) =>
+  subItem.includes('率') ||
+  subItem.includes('追客架電') ||
+  subItem.includes('メイン商材ない人にアクション');
+
 interface WeekData {
   target: string;
   actual: string;
@@ -97,10 +103,13 @@ export default function WeeklySiteKPIInputPage() {
         data.items.forEach((item: any) => {
           const key = `${item.mainItem}::${item.subItem}`;
           if (formattedData[key]) {
+            const pct = isPercentItem(item.subItem);
             for (let w = 1; w <= 5; w++) {
+              const rawTarget = item[`week${w}Target`];
+              const rawActual = item[`week${w}Actual`];
               formattedData[key][`week${w}` as keyof typeof formattedData[typeof key]] = {
-                target: item[`week${w}Target`]?.toString() || '',
-                actual: item[`week${w}Actual`]?.toString() || '',
+                target: rawTarget != null ? (pct ? (rawTarget * 100).toFixed(1) : rawTarget.toString()) : '',
+                actual: rawActual != null ? (pct ? (rawActual * 100).toFixed(1) : rawActual.toString()) : '',
               };
             }
           }
@@ -149,7 +158,17 @@ export default function WeeklySiteKPIInputPage() {
     try {
       const items = Object.entries(kpiData).map(([key, weeks]) => {
         const [mainItem, subItem] = key.split('::');
-        return { mainItem, subItem, weeks };
+        const pct = isPercentItem(subItem);
+        const convertedWeeks: typeof weeks = {} as typeof weeks;
+        for (let w = 1; w <= 5; w++) {
+          const wk = `week${w}` as keyof typeof weeks;
+          const wd = weeks[wk];
+          convertedWeeks[wk] = {
+            target: pct && wd.target !== '' ? (parseFloat(wd.target) / 100).toString() : wd.target,
+            actual: pct && wd.actual !== '' ? (parseFloat(wd.actual) / 100).toString() : wd.actual,
+          };
+        }
+        return { mainItem, subItem, weeks: convertedWeeks };
       });
 
       const response = await fetch('/api/admin/weekly-site-kpi', {
@@ -305,18 +324,25 @@ export default function WeeklySiteKPIInputPage() {
                               return (
                                 <td key={week} className="px-2 py-2 border-r border-gray-200">
                                   {weekData?.target !== undefined && weekData.target !== '' && (
-                                    <div className="text-xs text-gray-400 text-center mb-1">目標: {weekData.target}</div>
+                                    <div className="text-xs text-gray-400 text-center mb-1">
+                                      目標: {weekData.target}{isPercentItem(subItem) ? '%' : ''}
+                                    </div>
                                   )}
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={weekData?.actual || ''}
-                                    onChange={(e) =>
-                                      handleInputChange(key, `week${week}`, 'actual', e.target.value)
-                                    }
-                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="-"
-                                  />
+                                  <div className="relative flex items-center">
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={weekData?.actual || ''}
+                                      onChange={(e) =>
+                                        handleInputChange(key, `week${week}`, 'actual', e.target.value)
+                                      }
+                                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="-"
+                                    />
+                                    {isPercentItem(subItem) && (
+                                      <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                                    )}
+                                  </div>
                                 </td>
                               );
                             })}

@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save, Target } from 'lucide-react';
 
+// ％表記の項目かどうか
+const isKpiPercent = (itemName: string) => itemName.includes('率');
+const isSitePercent = (subItem: string) =>
+  subItem.includes('率') ||
+  subItem.includes('追客架電') ||
+  subItem.includes('メイン商材ない人にアクション');
+
 // 週次KPI項目
 const KPI_ITEMS = [
   '問合件数', 'メインターゲット数', 'メインターゲット率',
@@ -76,8 +83,10 @@ export default function TargetSettingsPage() {
     });
     (data.items || []).forEach((item: any) => {
       if (formatted[item.itemName]) {
+        const pct = isKpiPercent(item.itemName);
         for (let w = 1; w <= 5; w++) {
-          formatted[item.itemName][`week${w}`] = item[`week${w}Target`]?.toString() || '';
+          const raw = item[`week${w}Target`];
+          formatted[item.itemName][`week${w}`] = raw != null ? (pct ? (raw * 100).toFixed(1) : raw.toString()) : '';
         }
       }
     });
@@ -97,8 +106,10 @@ export default function TargetSettingsPage() {
     (data.items || []).forEach((item: any) => {
       const key = `${item.mainItem}::${item.subItem}`;
       if (formatted[key]) {
+        const pct = isSitePercent(item.subItem);
         for (let w = 1; w <= 5; w++) {
-          formatted[key][`week${w}`] = item[`week${w}Target`]?.toString() || '';
+          const raw = item[`week${w}Target`];
+          formatted[key][`week${w}`] = raw != null ? (pct ? (raw * 100).toFixed(1) : raw.toString()) : '';
         }
       }
     });
@@ -159,16 +170,20 @@ export default function TargetSettingsPage() {
   const saveKpiTargets = async () => {
     setSaving(true);
     try {
-      const items = KPI_ITEMS.map((itemName) => ({
-        itemName,
-        weeks: {
-          week1: { target: kpiTargets[itemName]?.week1 || '' },
-          week2: { target: kpiTargets[itemName]?.week2 || '' },
-          week3: { target: kpiTargets[itemName]?.week3 || '' },
-          week4: { target: kpiTargets[itemName]?.week4 || '' },
-          week5: { target: kpiTargets[itemName]?.week5 || '' },
-        },
-      }));
+      const items = KPI_ITEMS.map((itemName) => {
+        const pct = isKpiPercent(itemName);
+        const toDb = (v: string) => pct && v !== '' ? (parseFloat(v) / 100).toString() : v;
+        return {
+          itemName,
+          weeks: {
+            week1: { target: toDb(kpiTargets[itemName]?.week1 || '') },
+            week2: { target: toDb(kpiTargets[itemName]?.week2 || '') },
+            week3: { target: toDb(kpiTargets[itemName]?.week3 || '') },
+            week4: { target: toDb(kpiTargets[itemName]?.week4 || '') },
+            week5: { target: toDb(kpiTargets[itemName]?.week5 || '') },
+          },
+        };
+      });
       const res = await fetch('/api/admin/weekly-kpi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -191,14 +206,16 @@ export default function TargetSettingsPage() {
       const items = SITE_KPI_STRUCTURE.flatMap(({ mainItem, subItems }) =>
         subItems.map((subItem) => {
           const key = `${mainItem}::${subItem}`;
+          const pct = isSitePercent(subItem);
+          const toDb = (v: string) => pct && v !== '' ? (parseFloat(v) / 100).toString() : v;
           return {
             mainItem, subItem,
             weeks: {
-              week1: { target: siteTargets[key]?.week1 || '' },
-              week2: { target: siteTargets[key]?.week2 || '' },
-              week3: { target: siteTargets[key]?.week3 || '' },
-              week4: { target: siteTargets[key]?.week4 || '' },
-              week5: { target: siteTargets[key]?.week5 || '' },
+              week1: { target: toDb(siteTargets[key]?.week1 || '') },
+              week2: { target: toDb(siteTargets[key]?.week2 || '') },
+              week3: { target: toDb(siteTargets[key]?.week3 || '') },
+              week4: { target: toDb(siteTargets[key]?.week4 || '') },
+              week5: { target: toDb(siteTargets[key]?.week5 || '') },
             },
           };
         })
@@ -236,8 +253,10 @@ export default function TargetSettingsPage() {
     });
     (data.items || []).forEach((item: any) => {
       if (formatted[item.itemName]) {
+        const pct = isKpiPercent(item.itemName);
         for (let w = 1; w <= 5; w++) {
-          formatted[item.itemName][`week${w}`] = item[`week${w}Target`]?.toString() || '';
+          const raw = item[`week${w}Target`];
+          formatted[item.itemName][`week${w}`] = raw != null ? (pct ? (raw * 100).toFixed(1) : raw.toString()) : '';
         }
       }
     });
@@ -259,8 +278,10 @@ export default function TargetSettingsPage() {
     (data.items || []).forEach((item: any) => {
       const key = `${item.mainItem}::${item.subItem}`;
       if (formatted[key]) {
+        const pct = isSitePercent(item.subItem);
         for (let w = 1; w <= 5; w++) {
-          formatted[key][`week${w}`] = item[`week${w}Target`]?.toString() || '';
+          const raw = item[`week${w}Target`];
+          formatted[key][`week${w}`] = raw != null ? (pct ? (raw * 100).toFixed(1) : raw.toString()) : '';
         }
       }
     });
@@ -426,19 +447,24 @@ export default function TargetSettingsPage() {
                           return (
                             <td key={w} className={`px-2 py-2 border-r border-gray-200 ${!range ? 'bg-gray-50' : ''}`}>
                               {range ? (
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  value={kpiTargets[itemName]?.[`week${w}`] || ''}
-                                  onChange={(e) =>
-                                    setKpiTargets((prev) => ({
-                                      ...prev,
-                                      [itemName]: { ...prev[itemName], [`week${w}`]: e.target.value },
-                                    }))
-                                  }
-                                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  placeholder="-"
-                                />
+                                <div className="relative flex items-center">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={kpiTargets[itemName]?.[`week${w}`] || ''}
+                                    onChange={(e) =>
+                                      setKpiTargets((prev) => ({
+                                        ...prev,
+                                        [itemName]: { ...prev[itemName], [`week${w}`]: e.target.value },
+                                      }))
+                                    }
+                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="-"
+                                  />
+                                  {isKpiPercent(itemName) && (
+                                    <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                                  )}
+                                </div>
                               ) : (
                                 <div className="text-center text-gray-400 text-xs">—</div>
                               )}
@@ -516,19 +542,24 @@ export default function TargetSettingsPage() {
                                 return (
                                   <td key={w} className={`px-2 py-2 border-r border-gray-200 ${!range ? 'bg-gray-50' : ''}`}>
                                     {range ? (
-                                      <input
-                                        type="number"
-                                        step="0.01"
-                                        value={siteTargets[key]?.[`week${w}`] || ''}
-                                        onChange={(e) =>
-                                          setSiteTargets((prev) => ({
-                                            ...prev,
-                                            [key]: { ...prev[key], [`week${w}`]: e.target.value },
-                                          }))
-                                        }
-                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="-"
-                                      />
+                                      <div className="relative flex items-center">
+                                        <input
+                                          type="number"
+                                          step="0.01"
+                                          value={siteTargets[key]?.[`week${w}`] || ''}
+                                          onChange={(e) =>
+                                            setSiteTargets((prev) => ({
+                                              ...prev,
+                                              [key]: { ...prev[key], [`week${w}`]: e.target.value },
+                                            }))
+                                          }
+                                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                          placeholder="-"
+                                        />
+                                        {isSitePercent(subItem) && (
+                                          <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                                        )}
+                                      </div>
                                     ) : (
                                       <div className="text-center text-gray-400 text-xs">—</div>
                                     )}

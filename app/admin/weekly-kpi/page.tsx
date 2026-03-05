@@ -21,6 +21,9 @@ const KPI_ITEMS = [
   '営業部残業時間',
 ];
 
+// ％表記の項目かどうか
+const isPercentItem = (itemName: string) => itemName.includes('率');
+
 interface WeekData {
   target: string;
   actual: string;
@@ -72,11 +75,14 @@ export default function WeeklyKPIInputPage() {
       if (data.items) {
         data.items.forEach((item: any) => {
           if (formattedData[item.itemName]) {
+            const pct = isPercentItem(item.itemName);
             for (let w = 1; w <= 5; w++) {
               const weekKey = `week${w}`;
+              const rawTarget = item[`week${w}Target`];
+              const rawActual = item[`week${w}Actual`];
               formattedData[item.itemName][weekKey] = {
-                target: item[`week${w}Target`]?.toString() || '',
-                actual: item[`week${w}Actual`]?.toString() || '',
+                target: rawTarget != null ? (pct ? (rawTarget * 100).toFixed(1) : rawTarget.toString()) : '',
+                actual: rawActual != null ? (pct ? (rawActual * 100).toFixed(1) : rawActual.toString()) : '',
               };
             }
           }
@@ -120,10 +126,19 @@ export default function WeeklyKPIInputPage() {
     setMessage(null);
 
     try {
-      const items = Object.entries(kpiData).map(([itemName, weeks]) => ({
-        itemName,
-        weeks,
-      }));
+      const items = Object.entries(kpiData).map(([itemName, weeks]) => {
+        const pct = isPercentItem(itemName);
+        const convertedWeeks: typeof weeks = {} as typeof weeks;
+        for (let w = 1; w <= 5; w++) {
+          const key = `week${w}`;
+          const wd = weeks[key];
+          convertedWeeks[key] = {
+            target: pct && wd.target !== '' ? (parseFloat(wd.target) / 100).toString() : wd.target,
+            actual: pct && wd.actual !== '' ? (parseFloat(wd.actual) / 100).toString() : wd.actual,
+          };
+        }
+        return { itemName, weeks: convertedWeeks };
+      });
 
       const response = await fetch('/api/admin/weekly-kpi', {
         method: 'POST',
@@ -268,18 +283,25 @@ export default function WeeklyKPIInputPage() {
                         return (
                           <td key={week} className="px-2 py-2 border-r border-gray-200">
                             {weekData?.target !== undefined && weekData.target !== '' && (
-                              <div className="text-xs text-gray-400 text-center mb-1">目標: {weekData.target}</div>
+                              <div className="text-xs text-gray-400 text-center mb-1">
+                                目標: {weekData.target}{isPercentItem(itemName) ? '%' : ''}
+                              </div>
                             )}
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={weekData?.actual || ''}
-                              onChange={(e) =>
-                                handleInputChange(itemName, `week${week}`, 'actual', e.target.value)
-                              }
-                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="-"
-                            />
+                            <div className="relative flex items-center">
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={weekData?.actual || ''}
+                                onChange={(e) =>
+                                  handleInputChange(itemName, `week${week}`, 'actual', e.target.value)
+                                }
+                                className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="-"
+                              />
+                              {isPercentItem(itemName) && (
+                                <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                              )}
+                            </div>
                           </td>
                         );
                       })}
