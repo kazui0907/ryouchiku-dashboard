@@ -7,10 +7,34 @@ export async function GET(request: Request) {
     const year = parseInt(searchParams.get('year') || '2026');
     const month = parseInt(searchParams.get('month') || '1');
 
+    // スプレッドシートB列と同じ順番（mainItem::subItem）
+    const SITE_KPI_ORDER = [
+      '問合数::コンバージョン単価', '問合数::ユーザー数', '問合数::指定物件ＳＮＳ投稿数',
+      '商談件数::追客架電（商談前）', '商談件数::メイン商材ない人にアクション',
+      '受注件数::ロープレ回数',
+      '平均限界利益額::新規商談平均粗利額', '平均限界利益額::景山', '平均限界利益額::京屋',
+      '平均限界利益額::中谷', '平均限界利益額::熊田', '平均限界利益額::大島',
+      '平均限界利益額::森谷', '平均限界利益額::星野', '平均限界利益額::安栗', '平均限界利益額::SR',
+      '顧客満足向上::ありがとうカード配布数', '顧客満足向上::口コミ回収率',
+      '不動産::交渉物件数',
+      'IT::商談件数', 'IT::成約率',
+    ];
+
     // データベースから読み込み
     const dbItems = await prisma.weeklySiteKPI.findMany({
       where: { year, month },
-      orderBy: [{ mainItem: 'asc' }, { subItem: 'asc' }],
+    });
+
+    // スプレッドシート順にソート
+    dbItems.sort((a, b) => {
+      const aKey = `${a.mainItem}::${a.subItem}`;
+      const bKey = `${b.mainItem}::${b.subItem}`;
+      const ai = SITE_KPI_ORDER.indexOf(aKey);
+      const bi = SITE_KPI_ORDER.indexOf(bKey);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
     });
 
     // KPI項目を整形
