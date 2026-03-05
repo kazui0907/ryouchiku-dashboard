@@ -146,14 +146,21 @@ export async function POST(request: Request) {
         continue;
       }
 
+      // 期末棚卸高は「期首 + 仕入 − 期末 = 材料費」のため、コスト控除としてマイナス保存
+      const isEndInventory = displayCategory.includes('期末') && displayCategory.includes('棚卸');
+      const neg = (v: number | null) => (v == null ? null : -Math.abs(v));
+
       const months = [];
       for (let month = 1; month <= 12; month++) {
         const cols = monthColumns[month];
+        const lastYear = parseAmountNullable(row[cols.lastYear]);
+        const budget = parseAmountNullable(row[cols.budget]);
+        const actual = parseAmountNullable(row[cols.actual]);
         months.push({
           month,
-          lastYear: parseAmountNullable(row[cols.lastYear]),
-          budget: parseAmountNullable(row[cols.budget]),
-          actual: parseAmountNullable(row[cols.actual]),
+          lastYear: isEndInventory ? neg(lastYear) : lastYear,
+          budget: isEndInventory ? neg(budget) : budget,
+          actual: isEndInventory ? neg(actual) : actual,
         });
       }
 
