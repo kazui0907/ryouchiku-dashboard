@@ -7,10 +7,26 @@ export async function GET(request: Request) {
     const year = parseInt(searchParams.get('year') || '2026');
     const month = parseInt(searchParams.get('month') || '1');
 
+    // スプレッドシートと同じ順番
+    const KPI_ORDER = [
+      '問合件数', 'メインターゲット数', 'メインターゲット率', 'meta広告問合せ',
+      'SR商談件数', 'MEET商談件数', '商談設定率', '受注件数', '受注率',
+      '平均限界粗利単価', '施工部残業時間', '営業部残業時間',
+    ];
+
     // データベースから読み込み
     const dbItems = await prisma.weeklyKPI.findMany({
       where: { year, month },
-      orderBy: { itemName: 'asc' },
+    });
+
+    // スプレッドシート順にソート
+    dbItems.sort((a, b) => {
+      const ai = KPI_ORDER.indexOf(a.itemName);
+      const bi = KPI_ORDER.indexOf(b.itemName);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
     });
 
     // KPI項目を整形
