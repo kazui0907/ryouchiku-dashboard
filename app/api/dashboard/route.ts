@@ -6,6 +6,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const year = parseInt(searchParams.get('year') || '2026');
     const month = parseInt(searchParams.get('month') || new Date().getMonth().toString());
+    const fromMonth = parseInt(searchParams.get('fromMonth') || '1');
+    const toMonth = parseInt(searchParams.get('toMonth') || month.toString());
 
     // 当月の会計データ
     const currentMonthData = await prisma.monthlyAccounting.findUnique({
@@ -19,11 +21,11 @@ export async function GET(request: Request) {
       where: { year_month: { year: prevYear, month: prevMonth } },
     });
 
-    // 年初来の累計
+    // 期間累計（fromMonth〜toMonth）
     const ytdData = await prisma.monthlyAccounting.findMany({
       where: {
         year,
-        month: { lte: month },
+        month: { gte: fromMonth, lte: toMonth },
       },
     });
 

@@ -98,12 +98,14 @@ export default function Dashboard() {
   const currentDate = new Date();
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
+  const [fromMonth, setFromMonth] = useState(1);
+  const [toMonth, setToMonth] = useState(currentDate.getMonth() + 1);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const [dashboardResponse, weeklyKPIResponse, weeklySiteKPIResponse] = await Promise.all([
-          fetch(`/api/dashboard?year=${selectedYear}&month=${selectedMonth}`),
+          fetch(`/api/dashboard?year=${selectedYear}&month=${selectedMonth}&fromMonth=${fromMonth}&toMonth=${toMonth}`),
           fetch(`/api/weekly-kpi?year=${selectedYear}&month=${selectedMonth}`),
           fetch(`/api/weekly-site-kpi?year=${selectedYear}&month=${selectedMonth}`)
         ]);
@@ -121,7 +123,7 @@ export default function Dashboard() {
     }
 
     fetchData();
-  }, [selectedYear, selectedMonth]);
+  }, [selectedYear, selectedMonth, fromMonth, toMonth]);
 
   if (loading) {
     return (
@@ -278,6 +280,48 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* 期間選択 */}
+        {hasAccountingData && (
+          <div className="flex items-center gap-3 mb-4 bg-white border border-gray-200 rounded-lg px-4 py-3">
+            <span className="text-sm font-medium text-gray-700">累計期間:</span>
+            <select
+              value={fromMonth}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                setFromMonth(val);
+                if (val > toMonth) setToMonth(val);
+              }}
+              className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-1.5 border"
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>{m}月</option>
+              ))}
+            </select>
+            <span className="text-sm text-gray-500">〜</span>
+            <select
+              value={toMonth}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                setToMonth(val);
+                if (val < fromMonth) setFromMonth(val);
+              }}
+              className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-1.5 border"
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>{m}月</option>
+              ))}
+            </select>
+            {(fromMonth !== 1 || toMonth !== selectedMonth) && (
+              <button
+                onClick={() => { setFromMonth(1); setToMonth(selectedMonth); }}
+                className="text-xs text-blue-600 hover:text-blue-800 underline ml-1"
+              >
+                リセット
+              </button>
+            )}
+          </div>
+        )}
+
         {/* 主要指標サマリー */}
         {hasAccountingData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -324,7 +368,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">年初来累計</div>
+                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {formatCurrency(ytd.salesRevenue)}
                   </div>
@@ -407,7 +451,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">年初来累計</div>
+                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {formatCurrency(ytd.marginProfit)}
                   </div>
@@ -490,7 +534,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">年初来累計</div>
+                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {formatCurrency(ytd.grossProfit)}
                   </div>
@@ -577,7 +621,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">年初来累計</div>
+                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {ytd.operatingProfit !== null && ytd.operatingProfit !== undefined
                       ? formatCurrency(ytd.operatingProfit)
