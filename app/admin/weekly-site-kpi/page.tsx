@@ -17,9 +17,12 @@ const SITE_KPI_STRUCTURE = [
   },
   {
     mainItem: '受注件数',
+    subItems: ['ロープレ回数'],
+  },
+  {
+    mainItem: '平均限界利益額',
     subItems: [
-      'ロープレ回数',
-      '新規商談平均粗利額',
+      'MEET商談平均粗利額',
       '景山',
       '京屋',
       '中谷',
@@ -28,7 +31,11 @@ const SITE_KPI_STRUCTURE = [
       '森谷',
       '星野',
       '安栗',
-      'SR',
+      'SR商談平均粗利額',
+      'SR_京屋',
+      'SR_熊田',
+      'SR_星野',
+      'SR_安栗',
     ],
   },
   {

@@ -786,7 +786,7 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* 週次現場KPI進捗（積極版） */}
+        {/* 週次現場KPI進捗 */}
         {weeklySiteKPIData && weeklySiteKPIData.items && weeklySiteKPIData.items.length > 0 && (() => {
           // mainItemごとにグループ化
           const siteGroups: { mainItem: string; items: any[] }[] = [];
@@ -820,7 +820,7 @@ export default function Dashboard() {
             <Card className="mb-8">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>週次現場KPI進捗（積極版）</CardTitle>
+                  <CardTitle>週次現場KPI進捗</CardTitle>
                   <div className="text-sm text-gray-500">
                     全{weeklySiteKPIData.items.length}項目
                   </div>
