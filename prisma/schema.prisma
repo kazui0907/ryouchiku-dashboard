@@ -1,0 +1,235 @@
+// Prisma Schema for 龍竹一生 経営ダッシュボード
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 月次会計データ
+model MonthlyAccounting {
+  id                String   @id @default(cuid())
+  year              Int      // 年度
+  month             Int      // 月
+
+  // 売上高
+  salesRevenue      Float    // 売上高
+  salesDiscount     Float?   // 売上値引・返品
+
+  // 売上原価
+  costOfSales       Float    // 売上原価
+  materialPurchase  Float?   // 材料仕入高
+  constructionCost  Float?   // 工事原価
+  laborCost         Float?   // 労務費
+
+  // 利益
+  grossProfit       Float    // 売上総利益
+  grossProfitRate   Float    // 売上総利益率
+  marginProfit      Float?   // 限界利益
+  marginProfitRate  Float?   // 限界利益率
+
+  // 販売費及び一般管理費
+  sgaExpenses       Float?   // 販売費及び一般管理費
+  executiveComp     Float?   // 役員報酬
+  salesSalary       Float?   // 営業部給与
+  adminSalary       Float?   // 総務部給与
+  advertisingExp    Float?   // 広告宣伝費
+
+  // 営業利益
+  operatingProfit   Float?   // 営業利益
+
+  // 予算データ（予定数字）
+  budgetSales       Float?   // 予算売上高
+  budgetProfit      Float?   // 予算利益
+  budgetGrossProfit Float?   // 予算売上総利益
+  budgetMarginProfit Float?  // 予算限界利益
+  budgetOperatingProfit Float? // 予算営業利益
+
+  // 昨年実績
+  lastYearSalesRevenue Float?     // 昨年実績 売上高
+  lastYearCostOfSales  Float?     // 昨年実績 売上原価
+  lastYearGrossProfit  Float?     // 昨年実績 売上総利益
+  lastYearMarginProfit Float?     // 昨年実績 限界利益
+  lastYearOperatingProfit Float?  // 昨年実績 営業利益
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([year, month])
+  @@index([year, month])
+}
+
+// 週次KPI（積極版）
+model WeeklyKPI {
+  id                    String   @id @default(cuid())
+  year                  Int
+  month                 Int
+  itemName              String   // KPI項目名
+
+  // 第1週
+  week1Target           Float?
+  week1Actual           Float?
+  week1Rate             Float?
+
+  // 第2週
+  week2Target           Float?
+  week2Actual           Float?
+  week2Rate             Float?
+
+  // 第3週
+  week3Target           Float?
+  week3Actual           Float?
+  week3Rate             Float?
+
+  // 第4週
+  week4Target           Float?
+  week4Actual           Float?
+  week4Rate             Float?
+
+  // 第5週
+  week5Target           Float?
+  week5Actual           Float?
+  week5Rate             Float?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([year, month, itemName])
+  @@index([year, month])
+}
+
+// 週次現場KPI（積極版）
+model WeeklySiteKPI {
+  id                    String   @id @default(cuid())
+  year                  Int
+  month                 Int
+  mainItem              String   // メイン項目名
+  subItem               String   // サブ項目名
+
+  // 第1週
+  week1Target           Float?
+  week1Actual           Float?
+  week1Rate             Float?
+
+  // 第2週
+  week2Target           Float?
+  week2Actual           Float?
+  week2Rate             Float?
+
+  // 第3週
+  week3Target           Float?
+  week3Actual           Float?
+  week3Rate             Float?
+
+  // 第4週
+  week4Target           Float?
+  week4Actual           Float?
+  week4Rate             Float?
+
+  // 第5週
+  week5Target           Float?
+  week5Actual           Float?
+  week5Rate             Float?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([year, month, mainItem, subItem])
+  @@index([year, month])
+}
+
+// 個人別KPI
+model PersonalKPI {
+  id                String   @id @default(cuid())
+  year              Int
+  month             Int
+  weekNumber        Int
+  weekStartDate     DateTime
+  weekEndDate       DateTime
+
+  employeeId        String   // 従業員ID
+  employeeName      String   // 従業員名
+  department        String   // 部門(営業/SR)
+
+  // 目標と実績
+  targetProfit      Float    // 目標粗利額
+  actualProfit      Float?   // 実績粗利額
+  achievementRate   Float?   // 達成率
+
+  // その他KPI
+  orderCount        Int?     // 受注件数
+  meetingCount      Int?     // 商談件数
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([year, month, weekNumber, employeeId])
+  @@index([year, month, employeeId])
+}
+
+// 管理会計 明細行（accounting-full用）
+model AccountingLineItem {
+  id          String   @id @default(cuid())
+  year        Int
+  rowIndex    Int
+  category    String
+  subcategory String
+  monthsJson  String   // JSON: [{month, lastYear, budget, actual}, ...]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([year, rowIndex])
+  @@index([year])
+}
+
+// 貸借対照表（月次スナップショット）
+model BalanceSheet {
+  id                 String   @id @default(cuid())
+  year               Int
+  month              Int
+
+  // 資産
+  cash               Float?   // 現金及び預金合計
+  receivables        Float?   // 売上債権合計
+  inventory          Float?   // 棚卸資産合計
+  currentAssets      Float?   // 流動資産合計
+  tangibleAssets     Float?   // 有形固定資産合計
+  fixedAssets        Float?   // 固定資産合計
+  totalAssets        Float?   // 資産の部合計
+
+  // 負債
+  payables           Float?   // 仕入債務合計
+  currentLiabilities Float?   // 流動負債合計
+  fixedLiabilities   Float?   // 固定負債合計
+  totalLiabilities   Float?   // 負債の部合計
+
+  // 純資産
+  netAssets          Float?   // 純資産の部合計
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([year, month])
+  @@index([year, month])
+}
+
+// 予算データ
+model Budget {
+  id                String   @id @default(cuid())
+  year              Int
+  month             Int
+  salesTarget       Float    // 売上目標
+  profitTarget      Float    // 利益目標
+  inquiryTarget     Int      // 問合せ目標
+  orderTarget       Int      // 受注目標
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([year, month])
+  @@index([year, month])
+}
