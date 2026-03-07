@@ -27,20 +27,19 @@ function formatNum(val: number | null) {
 async function buildDataSection(year: number, month: number) {
   const targetMonths = getPastMonths(year, month, 3);
 
-  const [weeklyKpiRows, siteKpiRows, accountingRows] = await Promise.all([
-    prisma.weeklyKPI.findMany({
-      where: { OR: targetMonths.map(m => ({ year: m.year, month: m.month })) },
-      orderBy: [{ year: 'asc' }, { month: 'asc' }],
-    }),
-    prisma.weeklySiteKPI.findMany({
-      where: { OR: targetMonths.map(m => ({ year: m.year, month: m.month })) },
-      orderBy: [{ year: 'asc' }, { month: 'asc' }],
-    }),
-    prisma.monthlyAccounting.findMany({
-      where: { OR: targetMonths.map(m => ({ year: m.year, month: m.month })) },
-      orderBy: [{ year: 'asc' }, { month: 'asc' }],
-    }),
-  ]);
+  // 接続プール上限を回避するため順次実行
+  const weeklyKpiRows = await prisma.weeklyKPI.findMany({
+    where: { OR: targetMonths.map(m => ({ year: m.year, month: m.month })) },
+    orderBy: [{ year: 'asc' }, { month: 'asc' }],
+  });
+  const siteKpiRows = await prisma.weeklySiteKPI.findMany({
+    where: { OR: targetMonths.map(m => ({ year: m.year, month: m.month })) },
+    orderBy: [{ year: 'asc' }, { month: 'asc' }],
+  });
+  const accountingRows = await prisma.monthlyAccounting.findMany({
+    where: { OR: targetMonths.map(m => ({ year: m.year, month: m.month })) },
+    orderBy: [{ year: 'asc' }, { month: 'asc' }],
+  });
 
   let kpiSection = '=== 週次KPI（積極版）推移 ===\n';
   for (const { year: y, month: m } of targetMonths) {
