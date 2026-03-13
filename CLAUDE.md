@@ -64,3 +64,14 @@ npm run db:import-forecast   # 月次予算データをインポート
 
 - **リポジトリ:** `kazui0907/ryouchiku-dashboard`
 - **ローカルパス:** `D:\scripts\ryouchiku-dashboard`
+
+---
+
+## Git 運用ルール
+
+**ファイルを編集したら、必ず git commit & push すること。**
+
+- CLAUDE.md・コード・設定ファイルなど、種類を問わずすべての変更が対象
+- 編集作業が完了したら、その場で `git add` → `git commit` → `git push` まで実行する
+- 「後でまとめて push」は禁止。編集のたびに即座に push する
+- Claude Code が自律的に実行すること（ユーザーに push を依頼しない）
