@@ -19,7 +19,7 @@
 ## ディレクトリ構成
 
 ```
-ryouchiku-dashboard/
+LTS-dashboard/
 ├── app/                    ← Next.js App Router ページ
 │   ├── page.tsx            ← トップ（ダッシュボード）
 │   ├── accounting/         ← 経理
@@ -62,8 +62,8 @@ npm run db:import-forecast   # 月次予算データをインポート
 
 ## GitHub リポジトリ
 
-- **リポジトリ:** `kazui0907/ryouchiku-dashboard`
-- **ローカルパス:** `D:\scripts\ryouchiku-dashboard`
+- **リポジトリ:** `kazui0907/LTS-dashboard`
+- **ローカルパス:** `/Users/kazui/scripts/LTS-dashboard`
 
 ---
 

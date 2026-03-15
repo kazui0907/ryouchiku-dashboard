@@ -14,7 +14,7 @@
 1. [GitHub](https://github.com) にログイン
 2. 右上の「+」→「New repository」をクリック
 3. リポジトリ設定:
-   - **Repository name**: `ryouchiku-dashboard`
+   - **Repository name**: `LTS-dashboard`
    - **Description**: 龍竹一生 経営ダッシュボード
    - **Visibility**: Private（推奨）
    - **Initialize this repository with**: チェックを外す（空のリポジトリにする）
@@ -25,13 +25,13 @@
 現在のプロジェクトディレクトリで以下を実行：
 
 ```bash
-cd "/Users/kazui/Library/CloudStorage/GoogleDrive-ryouchiku@life-time-support.com/共有ドライブ/ryouchiku-workspace/group/board of directors/ryouchiku-dashboard"
+cd "/Users/kazui/scripts/LTS-dashboard"
 
 # Git初期化は既に完了しているので、リモートリポジトリを追加
-git remote add origin https://github.com/[あなたのユーザー名]/ryouchiku-dashboard.git
+git remote add origin https://github.com/[あなたのユーザー名]/LTS-dashboard.git
 
 # または SSH を使う場合（推奨）
-# git remote add origin git@github.com:[あなたのユーザー名]/ryouchiku-dashboard.git
+# git remote add origin git@github.com:[あなたのユーザー名]/LTS-dashboard.git
 ```
 
 ### ステップ3: 初回プッシュ
@@ -111,12 +111,12 @@ ssh -T git@github.com
 
 ```bash
 # HTTPSの場合
-git clone https://github.com/[ユーザー名]/ryouchiku-dashboard.git
+git clone https://github.com/[ユーザー名]/LTS-dashboard.git
 
 # SSHの場合
-git clone git@github.com:[ユーザー名]/ryouchiku-dashboard.git
+git clone git@github.com:[ユーザー名]/LTS-dashboard.git
 
-cd ryouchiku-dashboard
+cd LTS-dashboard
 npm install
 cp .env.example .env
 npx prisma generate

@@ -1,0 +1,95 @@
+name: マネーフォワード自動エクスポート
+
+on:
+  # 手動実行
+  workflow_dispatch:
+    inputs:
+      year:
+        description: '会計年度（空欄で自動判定）'
+        required: false
+        type: string
+      export_type:
+        description: 'エクスポート対象'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - pl
+          - bs
+
+  # 定期実行（毎月1日 AM9:00 JST = 0:00 UTC）
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 依存パッケージをインストール
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: 自動化スクリプトの依存パッケージをインストール
+        run: |
+          cd automation
+          npm install playwright googleapis
+
+      - name: マネーフォワードからエクスポート
+        env:
+          MF_EMAIL: ${{ secrets.MF_EMAIL }}
+          MF_PASSWORD: ${{ secrets.MF_PASSWORD }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          DASHBOARD_API_URL: ${{ secrets.DASHBOARD_API_URL }}
+          API_SECRET: ${{ secrets.API_SECRET }}
+          EXPORT_TYPE: ${{ github.event.inputs.export_type || 'both' }}
+          FISCAL_YEAR: ${{ github.event.inputs.year }}
+        run: npx tsx automation/mf-export.ts
+
+      - name: スクリーンショットをアップロード（デバッグ用）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 7
+
+      - name: ダウンロードしたCSVをアップロード
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exported-csv
+          path: downloads/
+          retention-days: 30
+
+      - name: Slack通知（成功）
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ マネーフォワード自動エクスポート完了\n会計データがダッシュボードに反映されました。"}' \
+            $SLACK_WEBHOOK_URL
+
+      - name: Slack通知（失敗）
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ マネーフォワード自動エクスポート失敗\n詳細: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+            $SLACK_WEBHOOK_URL

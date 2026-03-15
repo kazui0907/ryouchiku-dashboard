@@ -1,0 +1,20 @@
+{
+  "name": "mf-automation",
+  "version": "1.0.0",
+  "description": "マネーフォワード自動エクスポートスクリプト",
+  "type": "module",
+  "scripts": {
+    "export": "tsx mf-export.ts",
+    "export:local": "dotenv -e ../.env.local -- tsx mf-export.ts"
+  },
+  "dependencies": {
+    "googleapis": "^140.0.0",
+    "playwright": "^1.42.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "dotenv-cli": "^7.4.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}

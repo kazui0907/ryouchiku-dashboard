@@ -3,6 +3,18 @@ import { prisma } from '@/lib/prisma';
 import { parse } from 'csv-parse/sync';
 import iconv from 'iconv-lite';
 
+// ---- API認証 -------------------------------------------------------------
+
+const API_SECRET = process.env.API_SECRET;
+
+function verifyApiSecret(request: Request): boolean {
+  // API_SECRETが設定されていない場合は認証をスキップ（後方互換）
+  if (!API_SECRET) return true;
+
+  const providedSecret = request.headers.get('X-API-Secret');
+  return providedSecret === API_SECRET;
+}
+
 // ---- 数値パース -------------------------------------------------------
 
 function parseNum(v: string | undefined | null): number | null {
@@ -230,6 +242,11 @@ async function parseBS(rows: string[][], year: number) {
 
 export async function POST(request: Request) {
   try {
+    // API認証チェック（自動化スクリプトからのアクセス用）
+    if (!verifyApiSecret(request)) {
+      return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const yearStr = formData.get('year') as string;

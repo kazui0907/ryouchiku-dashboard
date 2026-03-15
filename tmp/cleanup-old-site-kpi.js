@@ -23,7 +23,7 @@ function deleteData(path, body) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body);
     const options = {
-      hostname: 'ryouchiku-dashboard.vercel.app',
+      hostname: 'lts-dashboard.vercel.app',
       path, method: 'DELETE',
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) },
       timeout: 30000
