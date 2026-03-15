@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx scripts/import-csv.ts",
-    "db:import-forecast": "tsx scripts/import-monthly-forecast.ts",
-    "mf-export": "npx tsx automation/mf-export.ts"
+    "db:import-forecast": "tsx scripts/import-monthly-forecast.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

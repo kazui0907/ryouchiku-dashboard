@@ -280,3 +280,12 @@ git push origin main
 - 編集作業が完了したら、その場で `git add` → `git commit` → `git push` まで実行する
 - 「後でまとめて push」は禁止。編集のたびに即座に push する
 - Claude Code が自律的に実行すること（ユーザーに push を依頼しない）
+
+---
+
+## クレデンシャル管理ルール
+
+**トークン・APIキーを取得/受領した場合は、必ず `lts-knowledge/06_credentials.md` に記録すること。**
+
+- 記録内容: サービス名・用途・キーの値・取得日・有効期限
+- トークンやAPIキーが必要になった場合は、まず `lts-knowledge/06_credentials.md` を確認してから質問する
