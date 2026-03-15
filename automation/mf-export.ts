@@ -349,31 +349,58 @@ async function login(page: Page): Promise<void> {
 
   // 事業者選択画面のチェック
   console.log('事業者選択画面をチェック中...');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle');
 
   if (page.url().includes('loginable_office_selection') || page.url().includes('office_selection')) {
     console.log('事業者選択画面を検出');
     await saveScreenshot(page, '10_office_selection');
 
+    // ページの読み込みを待機
+    await page.waitForTimeout(2000);
+
     // 事業者番号 5668-7415 を選択
     try {
-      // 5668-7415を含む行の選択ボタンをクリック
-      const targetRow = page.locator('tr:has-text("5668-7415"), div:has-text("5668-7415")').first();
-      const selectButton = targetRow.locator('button:has-text("選択する")');
+      // 様々なセレクタを試行
+      const buttonSelectors = [
+        'button:has-text("選択する")',
+        'input[type="submit"][value*="選択"]',
+        'a:has-text("選択する")',
+        '[role="button"]:has-text("選択")',
+        '.btn:has-text("選択")',
+      ];
 
-      if (await selectButton.isVisible({ timeout: 5000 })) {
-        await selectButton.click();
-        console.log('事業者（5668-7415）を選択しました');
-      } else {
-        // フォールバック: 最初の選択ボタンをクリック
-        const firstButton = page.locator('button:has-text("選択する")').first();
-        await firstButton.click();
-        console.log('最初の事業者を選択しました');
+      let clicked = false;
+      for (const selector of buttonSelectors) {
+        try {
+          const buttons = page.locator(selector);
+          const count = await buttons.count();
+          console.log(`セレクタ "${selector}" で ${count} 件のボタンを発見`);
+
+          if (count > 0) {
+            // 最初のボタン（5668-7415）をクリック
+            await buttons.first().click();
+            console.log(`事業者を選択しました (${selector})`);
+            clicked = true;
+            break;
+          }
+        } catch {
+          continue;
+        }
       }
+
+      if (!clicked) {
+        // テキストで直接クリック
+        console.log('ボタンセレクタで見つからないため、テキストでクリック試行');
+        await page.getByText('選択する').first().click();
+        console.log('テキストで事業者を選択しました');
+      }
+
       await page.waitForTimeout(3000);
       await page.waitForLoadState('networkidle');
     } catch (e) {
-      console.log('事業者選択ボタンが見つかりません:', e);
+      console.log('事業者選択でエラー:', e);
+      await saveScreenshot(page, '10_office_selection_error');
     }
   }
 
