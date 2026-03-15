@@ -385,3 +385,73 @@ notion-create-pages / notion-update-page ツールを使用
 
 - 記録内容: サービス名・用途・キーの値・取得日・有効期限
 - トークンやAPIキーが必要になった場合は、まず `lts-knowledge/06_credentials.md` を確認してから質問する
+
+---
+
+## Discord連携メール自動処理システム
+
+未読メールを自動処理し、Discordで確認・承認するシステム。
+
+### システム概要
+
+- **Discord Bot**: ユーザーの返信（OK/修正/ラベル変更等）をGoogle Driveに保存
+- **自動実行（launchd）**: 1分ごと（テスト）/ 30分ごと（本番）にClaude Codeを起動し、メール処理を実行
+- **対象**: 未読メールのみ（`is:unread`）
+
+### 起動コマンド
+
+**「Discord連携メール処理を起動して」** と言われたら、以下を実行：
+
+```bash
+# 1. Discord Bot を起動（バックグラウンド）
+cd /Users/kazui/scripts/ai-employee/k.ryochiku
+npm run discord-bot &
+
+# 2. 自動実行を開始
+launchctl load ~/Library/LaunchAgents/com.lts.auto-mail-check.plist
+```
+
+### 停止コマンド
+
+**「メール処理を停止して」** と言われたら、以下を実行：
+
+```bash
+# 1. 自動実行を停止
+launchctl unload ~/Library/LaunchAgents/com.lts.auto-mail-check.plist
+
+# 2. Discord Bot を停止
+pkill -f "discord-bot.js"
+```
+
+### 関連ファイル
+
+| ファイル | 用途 |
+|---------|------|
+| `scripts/discord-bot.js` | Discord Bot本体 |
+| `scripts/auto-mail-check.sh` | 自動実行スクリプト |
+| `.claude/commands/auto-reply-mail.md` | 処理ロジック定義 |
+| `.secrets/discord.env` | Bot Token & Channel ID |
+| `~/Library/LaunchAgents/com.lts.auto-mail-check.plist` | launchd設定 |
+
+### Google Driveフォルダ
+
+```
+マイドライブ/LTS-Mail-System/
+├── threads/      ← 処理中のメールスレッド
+├── processed/    ← 処理済みアーカイブ
+└── config/       ← 設定ファイル
+```
+
+### 実行間隔の変更
+
+テスト用（1分）→ 本番用（30分）に変更する場合：
+
+```bash
+# plistを編集
+# StartInterval を 60 → 1800 に変更
+vim ~/Library/LaunchAgents/com.lts.auto-mail-check.plist
+
+# 再読み込み
+launchctl unload ~/Library/LaunchAgents/com.lts.auto-mail-check.plist
+launchctl load ~/Library/LaunchAgents/com.lts.auto-mail-check.plist
+```
