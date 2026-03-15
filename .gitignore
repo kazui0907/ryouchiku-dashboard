@@ -53,3 +53,6 @@ automation/node_modules
 automation/.env*
 automation/downloads/
 automation/screenshots/
+
+# Credentials (sensitive information)
+lts-knowledge/06_credentials.md

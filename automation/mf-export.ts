@@ -18,6 +18,26 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 
+// .envファイルを読み込み
+function loadEnv() {
+  const envPath = path.join(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf-8');
+    for (const line of envContent.split('\n')) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const [key, ...valueParts] = trimmed.split('=');
+        const value = valueParts.join('=');
+        if (key && value && !process.env[key]) {
+          process.env[key] = value;
+        }
+      }
+    }
+  }
+}
+
+loadEnv();
+
 // 環境変数
 const MF_EMAIL = process.env.MF_EMAIL!;
 const MF_PASSWORD = process.env.MF_PASSWORD!;
