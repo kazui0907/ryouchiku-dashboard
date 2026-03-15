@@ -311,18 +311,32 @@ async function login(page: Page): Promise<void> {
     await saveScreenshot(page, '08_otp_entered');
     console.log('認証コードを入力しました');
 
-    // 送信ボタンをクリック
-    for (const selector of submitSelectors) {
+    // 認証するボタンをクリック
+    const otpSubmitSelectors = [
+      'button:has-text("認証する")',
+      'button:has-text("確認")',
+      'button:has-text("送信")',
+      ...submitSelectors,
+    ];
+
+    let otpSubmitted = false;
+    for (const selector of otpSubmitSelectors) {
       try {
         const btn = page.locator(selector).first();
         if (await btn.isVisible({ timeout: 2000 })) {
           await btn.click();
+          otpSubmitted = true;
           console.log(`認証コード送信ボタンをクリック: ${selector}`);
           break;
         }
       } catch {
         continue;
       }
+    }
+
+    if (!otpSubmitted) {
+      console.log('認証ボタンが見つからないため、Enterキーで送信');
+      await page.keyboard.press('Enter');
     }
 
     await page.waitForTimeout(2000);
