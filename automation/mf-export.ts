@@ -2,145 +2,46 @@
  * マネーフォワード クラウド会計 自動エクスポートスクリプト
  *
  * 処理フロー:
- * 1. MFにログイン（メール認証コード対応）
+ * 1. MFにログイン（MFA認証コードは手動入力）
  * 2. レポート → 推移表 → CSVダウンロード
  * 3. ダッシュボードAPIにアップロード
+ *
+ * 使用方法:
+ *   npx tsx automation/mf-export.ts
+ *
+ * 必要な環境変数:
+ *   MF_EMAIL, MF_PASSWORD
  */
 
 import { chromium, Page, Browser } from 'playwright';
-import { google } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as readline from 'readline';
 
 // 環境変数
 const MF_EMAIL = process.env.MF_EMAIL!;
 const MF_PASSWORD = process.env.MF_PASSWORD!;
-const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID!;
-const GMAIL_CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET!;
-const GMAIL_REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN!;
-const DASHBOARD_API_URL = process.env.DASHBOARD_API_URL || 'https://lts-dashboard.vercel.app/api/admin/upload';
+const DASHBOARD_API_URL = process.env.DASHBOARD_API_URL || 'https://ryouchiku-dashboard.vercel.app/api/admin/upload';
 const API_SECRET = process.env.API_SECRET;
 
 const DOWNLOAD_DIR = path.join(process.cwd(), 'downloads');
+const SCREENSHOT_DIR = path.join(process.cwd(), 'screenshots');
 
-// Gmail APIクライアント初期化
-function getGmailClient() {
-  const oauth2Client = new google.auth.OAuth2(
-    GMAIL_CLIENT_ID,
-    GMAIL_CLIENT_SECRET
-  );
-  oauth2Client.setCredentials({
-    refresh_token: GMAIL_REFRESH_TOKEN,
+// コンソールから入力を受け取る
+function prompt(question: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
   });
-  return google.gmail({ version: 'v1', auth: oauth2Client });
-}
-
-// マネーフォワードからの認証コードメールを待機・取得
-async function waitForOTP(maxWaitMs = 120000): Promise<string> {
-  const gmail = getGmailClient();
-  const startTime = Date.now();
-  const checkInterval = 5000; // 5秒ごとにチェック
-
-  console.log('認証コードメールを待機中...');
-
-  // 複数の検索クエリを試行（マネーフォワードのメール形式に対応）
-  const searchQueries = [
-    'from:moneyforward.com newer_than:5m is:unread',
-    'from:moneyforward subject:確認コード newer_than:5m',
-    'from:moneyforward subject:認証コード newer_than:5m',
-    'from:moneyforward subject:ワンタイムパスワード newer_than:5m',
-    'from:noreply@moneyforward.com newer_than:5m',
-    'from:no-reply@moneyforward.com newer_than:5m',
-    'subject:マネーフォワード 認証 newer_than:5m',
-  ];
-
-  while (Date.now() - startTime < maxWaitMs) {
-    for (const query of searchQueries) {
-      try {
-        console.log(`検索中: ${query}`);
-        const res = await gmail.users.messages.list({
-          userId: 'me',
-          q: query,
-          maxResults: 5,
-        });
-
-        if (res.data.messages && res.data.messages.length > 0) {
-          console.log(`${res.data.messages.length}件のメールが見つかりました`);
-
-          for (const msg of res.data.messages) {
-            const message = await gmail.users.messages.get({
-              userId: 'me',
-              id: msg.id!,
-              format: 'full',
-            });
-
-            // 件名を表示（デバッグ用）
-            const headers = message.data.payload?.headers || [];
-            const subject = headers.find(h => h.name === 'Subject')?.value || '(件名なし)';
-            const from = headers.find(h => h.name === 'From')?.value || '(送信者不明)';
-            console.log(`メール: From=${from}, Subject=${subject}`);
-
-            // メール本文から6桁の認証コードを抽出
-            const body = getMessageBody(message.data);
-            const otpMatch = body.match(/\b(\d{6})\b/);
-
-            if (otpMatch) {
-              console.log('認証コードを取得しました:', otpMatch[1]);
-
-              // 使用済みメールを既読にする（重複防止）
-              await gmail.users.messages.modify({
-                userId: 'me',
-                id: msg.id!,
-                requestBody: {
-                  removeLabelIds: ['UNREAD'],
-                },
-              });
-
-              return otpMatch[1];
-            }
-          }
-        }
-      } catch (error) {
-        console.error(`Gmail API エラー (${query}):`, error);
-      }
-    }
-
-    console.log(`メールが見つかりません。${checkInterval / 1000}秒後に再試行...`);
-    await new Promise(resolve => setTimeout(resolve, checkInterval));
-  }
-
-  throw new Error('認証コードメールのタイムアウト');
-}
-
-// メール本文を取得
-function getMessageBody(message: any): string {
-  const payload = message.payload;
-
-  if (payload.body?.data) {
-    return Buffer.from(payload.body.data, 'base64').toString('utf-8');
-  }
-
-  if (payload.parts) {
-    for (const part of payload.parts) {
-      if (part.mimeType === 'text/plain' && part.body?.data) {
-        return Buffer.from(part.body.data, 'base64').toString('utf-8');
-      }
-      if (part.parts) {
-        for (const subPart of part.parts) {
-          if (subPart.mimeType === 'text/plain' && subPart.body?.data) {
-            return Buffer.from(subPart.body.data, 'base64').toString('utf-8');
-          }
-        }
-      }
-    }
-  }
-
-  return '';
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer);
+    });
+  });
 }
 
 // スクリーンショット保存（デバッグ用）
-const SCREENSHOT_DIR = path.join(process.cwd(), 'screenshots');
-
 async function saveScreenshot(page: Page, name: string): Promise<void> {
   if (!fs.existsSync(SCREENSHOT_DIR)) {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
@@ -155,18 +56,16 @@ async function login(page: Page): Promise<void> {
   console.log('マネーフォワードにアクセス中...');
 
   // マネーフォワードクラウド会計のトップページにアクセス
-  // ログインしていない場合は自動的にログインページにリダイレクトされる
   await page.goto('https://biz.moneyforward.com/');
 
   // ページ読み込み完了を待機
   await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(2000);  // リダイレクト完了を待機
+  await page.waitForTimeout(2000);
   await saveScreenshot(page, '01_initial_page');
   console.log('初期ページにアクセスしました');
   console.log('現在のURL:', page.url());
 
   // ログインページへのリダイレクトを確認
-  // すでにログインページにいるか、ログインボタンがあるかを確認
   const currentUrl = page.url();
 
   if (currentUrl.includes('id.moneyforward.com')) {
@@ -197,7 +96,6 @@ async function login(page: Page): Promise<void> {
     }
 
     if (!clicked) {
-      // 直接ログインURLにアクセス
       console.log('ログインリンクが見つからないため、直接ログインURLにアクセス');
       await page.goto('https://id.moneyforward.com/sign_in');
     }
@@ -211,13 +109,7 @@ async function login(page: Page): Promise<void> {
 
   // メールアドレス入力欄を探す
   console.log('メールアドレス入力欄を探しています...');
-
-  // ページの読み込みを待機
   await page.waitForTimeout(2000);
-
-  // まずページ内の入力要素を確認
-  const inputCount = await page.locator('input').count();
-  console.log(`ページ内のinput要素数: ${inputCount}`);
 
   const emailSelectors = [
     'input[type="email"]',
@@ -230,7 +122,7 @@ async function login(page: Page): Promise<void> {
     'input[autocomplete="username"]',
     '#email',
     '#mfid_user_email',
-    'input:visible',  // 表示されているinput
+    'input:visible',
   ];
 
   let emailInput = null;
@@ -249,26 +141,16 @@ async function login(page: Page): Promise<void> {
 
   if (!emailInput) {
     await saveScreenshot(page, '02_error_no_email_input');
-    // ページのHTMLを出力してデバッグ
-    const html = await page.content();
-    console.log('ページHTML（最初の3000文字）:', html.substring(0, 3000));
-    console.log('現在のURL:', page.url());
     throw new Error('メールアドレス入力欄が見つかりません');
   }
 
   // メールアドレスを入力
   await emailInput.fill(MF_EMAIL);
-  await page.waitForTimeout(500);  // 入力完了を待機
+  await page.waitForTimeout(500);
   await saveScreenshot(page, '03_email_entered');
   console.log('メールアドレスを入力しました');
 
-  // ログインボタンを探してクリック
-  console.log('ログインボタンを探しています...');
-
-  // ボタン要素を確認
-  const buttonCount = await page.locator('button').count();
-  console.log(`ページ内のbutton要素数: ${buttonCount}`);
-
+  // ログインボタンをクリック
   const submitSelectors = [
     'button:has-text("ログインする")',
     'button:has-text("ログイン")',
@@ -276,7 +158,6 @@ async function login(page: Page): Promise<void> {
     'button:has-text("続ける")',
     'button[type="submit"]',
     'input[type="submit"]',
-    '[data-testid*="submit"]',
   ];
 
   let submitted = false;
@@ -284,33 +165,27 @@ async function login(page: Page): Promise<void> {
     try {
       const btn = page.locator(selector).first();
       if (await btn.isVisible({ timeout: 2000 })) {
-        console.log(`ボタンを発見: ${selector}`);
         await btn.click();
         submitted = true;
         console.log(`ボタンをクリックしました: ${selector}`);
         break;
       }
-    } catch (e) {
-      console.log(`セレクタ "${selector}" は見つかりませんでした`);
+    } catch {
       continue;
     }
   }
 
   if (!submitted) {
-    // Enterキーで送信を試行
-    console.log('ボタンが見つからないため、Enterキーで送信を試行');
     await page.keyboard.press('Enter');
   }
 
-  // ページ遷移を待機
-  console.log('ページ遷移を待機中...');
   await page.waitForTimeout(2000);
   await page.waitForLoadState('networkidle');
   await saveScreenshot(page, '04_after_email_submit');
   console.log('メールアドレス送信後のURL:', page.url());
 
-  // パスワード入力欄または認証コード入力欄を待機
-  console.log('パスワードまたは認証コード入力欄を探しています...');
+  // パスワード入力欄を探す
+  console.log('パスワード入力欄を探しています...');
 
   const passwordSelectors = [
     'input[type="password"]',
@@ -335,10 +210,6 @@ async function login(page: Page): Promise<void> {
 
   if (!passwordInput) {
     await saveScreenshot(page, '04_error_no_password_input');
-    console.log('パスワード入力欄が見つかりません。現在のURL:', page.url());
-    // ページのHTMLを出力
-    const html = await page.content();
-    console.log('ページHTML（最初の3000文字）:', html.substring(0, 3000));
     throw new Error('パスワード入力欄が見つかりません');
   }
 
@@ -366,7 +237,6 @@ async function login(page: Page): Promise<void> {
 
   if (!submitted) {
     await page.keyboard.press('Enter');
-    console.log('Enterキーで送信を試行');
   }
 
   await page.waitForTimeout(2000);
@@ -374,8 +244,8 @@ async function login(page: Page): Promise<void> {
   await saveScreenshot(page, '06_after_password_submit');
   console.log('パスワード送信後のURL:', page.url());
 
-  // 認証コード入力画面を待機
-  console.log('認証コード入力画面をチェック中...');
+  // MFA認証コード入力画面をチェック
+  console.log('MFA認証コード入力画面をチェック中...');
 
   const otpSelectors = [
     'input[name="mfid_user[code]"]',
@@ -402,11 +272,18 @@ async function login(page: Page): Promise<void> {
   }
 
   if (otpInput) {
-    console.log('認証コード入力画面を検出');
+    console.log('\n========================================');
+    console.log('MFA認証コードの入力が必要です');
+    console.log('メールで届いた6桁の認証コードを確認してください');
+    console.log('========================================\n');
     await saveScreenshot(page, '07_otp_required');
 
-    // Gmail APIで認証コードを取得
-    const otp = await waitForOTP();
+    // ユーザーに手動入力を促す
+    const otp = await prompt('認証コードを入力してEnterを押してください: ');
+
+    if (!otp || otp.length !== 6) {
+      throw new Error('認証コードは6桁の数字で入力してください');
+    }
 
     // 認証コードを入力
     await otpInput.fill(otp);
@@ -414,7 +291,7 @@ async function login(page: Page): Promise<void> {
     await saveScreenshot(page, '08_otp_entered');
     console.log('認証コードを入力しました');
 
-    // 送信
+    // 送信ボタンをクリック
     for (const selector of submitSelectors) {
       try {
         const btn = page.locator(selector).first();
@@ -433,12 +310,11 @@ async function login(page: Page): Promise<void> {
     await saveScreenshot(page, '09_after_otp_submit');
     console.log('認証コード送信後のURL:', page.url());
   } else {
-    console.log('認証コード入力は不要でした');
+    console.log('MFA認証コード入力は不要でした');
   }
 
-  // ログイン完了を確認（リダイレクト先のURL or 画面要素で判定）
+  // ログイン完了を確認
   console.log('ログイン完了を確認中...');
-  console.log('現在のURL:', page.url());
 
   let loginSuccess = false;
 
@@ -464,9 +340,6 @@ async function login(page: Page): Promise<void> {
 
   if (!loginSuccess) {
     await saveScreenshot(page, '10_login_failed');
-    console.log('ログイン失敗時のURL:', page.url());
-    const html = await page.content();
-    console.log('ページHTML（最初の3000文字）:', html.substring(0, 3000));
     throw new Error('ログインに失敗しました');
   }
 
@@ -498,7 +371,6 @@ async function downloadCSV(page: Page, type: 'pl' | 'bs'): Promise<string> {
   // CSVエクスポートボタンを探してクリック
   const downloadPromise = page.waitForEvent('download');
 
-  // エクスポートボタン（アイコンやテキストで探す）
   const exportButton = await page.locator('button:has-text("エクスポート"), button:has-text("CSV"), [aria-label*="エクスポート"], [aria-label*="CSV"]').first();
   await exportButton.click();
 
@@ -549,7 +421,7 @@ async function uploadToAPI(filePath: string, year: number): Promise<void> {
 // メイン処理
 async function main() {
   // 必須環境変数チェック
-  const requiredEnvs = ['MF_EMAIL', 'MF_PASSWORD', 'GMAIL_CLIENT_ID', 'GMAIL_CLIENT_SECRET', 'GMAIL_REFRESH_TOKEN'];
+  const requiredEnvs = ['MF_EMAIL', 'MF_PASSWORD'];
   for (const env of requiredEnvs) {
     if (!process.env[env]) {
       throw new Error(`環境変数 ${env} が設定されていません`);
@@ -566,7 +438,8 @@ async function main() {
   try {
     console.log('ブラウザを起動中...');
     browser = await chromium.launch({
-      headless: true,
+      headless: false,  // ブラウザを表示（MFA手動入力のため）
+      slowMo: 100,      // 操作を少し遅くして見やすく
     });
 
     const context = await browser.newContext({
@@ -594,7 +467,13 @@ async function main() {
     await saveScreenshot(page, 'after_bs_download');
     await uploadToAPI(bsFile, fiscalYear);
 
+    console.log('\n========================================');
     console.log('処理完了！');
+    console.log('========================================\n');
+
+    // 完了後、ユーザーがブラウザを確認できるよう少し待機
+    await prompt('Enterを押すとブラウザを閉じます...');
+
   } catch (error) {
     console.error('エラーが発生しました:', error);
 
