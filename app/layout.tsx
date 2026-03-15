@@ -17,25 +17,14 @@ export const metadata: Metadata = {
   description: "ライフタイムサポート グループ 経営管理会計システム",
 };
 
-const VERSION = 'v1.1.0';
-
-function formatJST(date: Date): string {
-  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
-  const yyyy = jst.getUTCFullYear();
-  const mm = String(jst.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(jst.getUTCDate()).padStart(2, '0');
-  const hh = String(jst.getUTCHours()).padStart(2, '0');
-  const min = String(jst.getUTCMinutes()).padStart(2, '0');
-  return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
-}
+const VERSION = 'v1.1.1';
+const BUILD_TIME = '2026/03/16 01:30';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const updatedAt = formatJST(new Date());
-
   return (
     <html lang="ja">
       <body
@@ -43,7 +32,7 @@ export default function RootLayout({
       >
         {children}
         <div className="fixed bottom-2 right-3 text-xs text-gray-400 pointer-events-none select-none">
-          システム最終更新: {updatedAt} | バージョン: {VERSION}
+          Build: {BUILD_TIME} | {VERSION}
         </div>
       </body>
     </html>

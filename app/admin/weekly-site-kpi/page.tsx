@@ -80,7 +80,7 @@ export default function WeeklySiteKPIInputPage() {
   const [kpiData, setKpiData] = useState<SiteKPIData>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string; detail?: string } | null>(null);
 
   useEffect(() => {
     loadData();
@@ -194,10 +194,18 @@ export default function WeeklySiteKPIInputPage() {
         setMessage({ type: 'success', text: '保存しました' });
         await loadData();
       } else {
-        setMessage({ type: 'error', text: result.error || '保存に失敗しました' });
+        setMessage({
+          type: 'error',
+          text: result.error || '保存に失敗しました',
+          detail: `Status: ${response.status} | ${JSON.stringify(result)}`
+        });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'エラーが発生しました' });
+      setMessage({
+        type: 'error',
+        text: 'エラーが発生しました',
+        detail: error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+      });
     } finally {
       setSaving(false);
     }
@@ -263,7 +271,12 @@ export default function WeeklySiteKPIInputPage() {
                 message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
               }`}
             >
-              {message.text}
+              <div>{message.text}</div>
+              {message.detail && (
+                <div className="mt-1 text-xs font-mono opacity-70 break-all">
+                  {message.detail}
+                </div>
+              )}
             </div>
           )}
         </div>
