@@ -8,9 +8,9 @@
 
 | 項目 | URL / 情報 |
 |------|------------|
-| **Webアプリ** | https://lts-dashboard.vercel.app/ |
-| **管理画面（アップロード）** | https://lts-dashboard.vercel.app/admin/upload |
-| **GitHub** | https://github.com/kazui0907/LTS-dashboard |
+| **Webアプリ** | https://ryouchiku-dashboard.vercel.app/ |
+| **管理画面（アップロード）** | https://ryouchiku-dashboard.vercel.app/admin/upload |
+| **GitHub** | https://github.com/LTS0907/ryouchiku-dashboard |
 | **データベース** | Supabase PostgreSQL（Singaporeリージョン） |
 | **ホスティング** | Vercel（GitHubプッシュで自動デプロイ） |
 

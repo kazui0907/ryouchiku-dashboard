@@ -62,8 +62,9 @@ npm run db:import-forecast   # 月次予算データをインポート
 
 ## GitHub リポジトリ
 
-- **リポジトリ:** `kazui0907/LTS-dashboard`
+- **リポジトリ:** `LTS0907/ryouchiku-dashboard`
 - **ローカルパス:** `/Users/kazui/scripts/LTS-dashboard`
+- **本番URL:** https://ryouchiku-dashboard.vercel.app/
 
 ---
 
