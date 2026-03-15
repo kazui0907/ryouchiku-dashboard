@@ -174,11 +174,12 @@ async function login(page: Page): Promise<void> {
 
   // 次へ/ログインボタンを探してクリック
   const submitSelectors = [
+    'button:has-text("ログインする")',
+    'button:has-text("ログイン")',
+    'button:has-text("次へ")',
+    'button:has-text("続ける")',
     'button[type="submit"]',
     'input[type="submit"]',
-    'button:has-text("次へ")',
-    'button:has-text("ログイン")',
-    'button:has-text("続ける")',
     '[data-testid*="submit"]',
   ];
 
