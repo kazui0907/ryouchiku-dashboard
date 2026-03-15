@@ -1,0 +1,21 @@
+{
+  "name": "k.ryochiku",
+  "version": "1.0.0",
+  "description": "LTS AI Employee - k.ryochiku",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "discord-bot": "node scripts/discord-bot.js",
+    "discord-bot:start": "pm2 start scripts/discord-bot.js --name lts-mail-bot",
+    "discord-bot:stop": "pm2 stop lts-mail-bot",
+    "discord-bot:logs": "pm2 logs lts-mail-bot"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.3.1",
+    "playwright": "^1.58.2"
+  }
+}

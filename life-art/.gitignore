@@ -1,0 +1,20 @@
+# 環境変数
+.env
+.env.local
+.env.*.local
+
+# 依存パッケージ
+node_modules/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/
+.idea/
+
+# ログ
+*.log

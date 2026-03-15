@@ -56,3 +56,6 @@ automation/screenshots/
 
 # Credentials (sensitive information)
 lts-knowledge/06_credentials.md
+
+# MCP configuration files with secrets
+**/.mcp.json

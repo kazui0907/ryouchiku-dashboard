@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: #f5f7fa; color: #333; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #e65100, #bf360c);
+    color: #fff;
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  /* Progress */
+  .progress-section { margin-top: 12px; }
+  .progress-bar-bg { background: rgba(255,255,255,0.25); border-radius: 10px; height: 8px; overflow: hidden; }
+  .progress-bar-fill { background: #4caf50; height: 100%; border-radius: 10px; transition: width 0.4s ease; }
+  .progress-text { font-size: 13px; margin-top: 4px; opacity: 0.9; }
+
+  /* Buttons */
+  .btn {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-view { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
+  .btn-view.active { background: #fff; color: #e65100; }
+  .btn-filter { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 12px; padding: 5px 12px; }
+  .btn-filter.active { background: #fff; color: #e65100; }
+  .btn-primary { background: #4caf50; color: #fff; }
+  .btn-primary:hover { background: #43a047; }
+  .btn-secondary { background: #e0e0e0; color: #333; }
+  .btn-secondary:hover { background: #bdbdbd; }
+  .btn-send { background: #e65100; color: #fff; }
+  .btn-send:hover { background: #bf360c; }
+  .btn-approve { background: #2e7d32; color: #fff; }
+  .btn-approve:hover { background: #1b5e20; }
+
+  /* Filter row */
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .filter-label { font-size: 12px; opacity: 0.8; margin-right: 4px; }
+  .filter-divider { color: rgba(255,255,255,0.3); }
+
+  /* Bulk bar */
+  .bulk-bar {
+    background: #fff3e0;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #ffe0b2;
+    display: none;
+  }
+  .bulk-bar.show { display: flex; }
+  .bulk-bar span { font-size: 14px; font-weight: 500; color: #e65100; }
+
+  /* Loading */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #e65100;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { margin-top: 16px; color: #666; font-size: 14px; }
+
+  /* List View */
+  .list-view { padding: 16px 24px; }
+  .table-wrap { background: #fff; border-radius: 10px; overflow-x: auto; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  thead th {
+    background: #f8f9fa;
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e0e0e0;
+    white-space: nowrap;
+  }
+  thead th:first-child { padding-left: 16px; width: 40px; }
+  tbody tr { border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.15s; }
+  tbody tr:hover { background: #fff8f0; }
+  tbody td { padding: 10px 14px; font-size: 14px; }
+  tbody td:first-child { padding-left: 16px; }
+  .td-num { color: #999; font-size: 13px; width: 40px; }
+  .td-company { font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .td-category { white-space: nowrap; }
+  .td-email { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #555; font-size: 13px; }
+  .td-subject { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #555; }
+  .td-status { white-space: nowrap; }
+  .td-actions { white-space: nowrap; }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .status-unsent { background: #f3f4f6; color: #6b7280; }
+  .status-draft { background: #fff8e1; color: #f57f17; }
+  .status-approved { background: #e8f5e9; color: #2e7d32; }
+  .status-sent { background: #e3f2fd; color: #1565c0; }
+  .status-error { background: #fce4ec; color: #c62828; }
+
+  .category-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .cat-ゼネコン { background: #e8eaf6; color: #283593; }
+  .cat-不動産 { background: #e0f2f1; color: #00695c; }
+  .cat-設計事務所 { background: #fce4ec; color: #880e4f; }
+  .cat-ハウスメーカー { background: #fff3e0; color: #e65100; }
+
+  .check-col { width: 36px; }
+  .check-col input { width: 16px; height: 16px; cursor: pointer; }
+
+  /* Card View */
+  .card-view { padding: 16px 24px; max-width: 800px; margin: 0 auto; }
+  .card-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-nav-info { font-size: 15px; font-weight: 500; color: #555; }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .card-header {
+    background: #f8f9fa;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .card-company { font-size: 18px; font-weight: 600; color: #e65100; }
+  .card-meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; color: #666; }
+  .card-meta span { display: flex; align-items: center; gap: 4px; }
+  .card-category { margin-top: 10px; }
+
+  .card-body { padding: 24px; }
+  .card-section { margin-bottom: 24px; }
+  .card-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .card-section-title { font-size: 13px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card-subject { font-size: 16px; font-weight: 500; line-height: 1.5; padding: 12px 16px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; }
+  .card-email-body {
+    font-size: 14px;
+    line-height: 1.8;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    white-space: pre-wrap;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  .card-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .card-info-item { font-size: 14px; }
+  .card-info-item .label { font-size: 12px; color: #999; font-weight: 600; }
+  .card-info-item .value { margin-top: 2px; }
+
+  .card-footer {
+    padding: 20px 24px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .card-status-area { display: flex; align-items: center; gap: 12px; }
+  .btn-send-lg {
+    background: linear-gradient(135deg, #e65100, #bf360c);
+    color: #fff;
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-send-lg:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(230,81,0,0.4); }
+  .btn-send-lg:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .modal-header h2 { font-size: 18px; }
+  .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 4px 8px; }
+  .modal-close:hover { color: #333; }
+  .modal-body { padding: 24px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px; }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { outline: none; border-color: #e65100; box-shadow: 0 0 0 3px rgba(230,81,0,0.1); }
+  .form-group textarea { min-height: 350px; line-height: 1.7; resize: vertical; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* Confirm dialog */
+  .confirm-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 250;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .confirm-box h3 { margin-bottom: 16px; font-size: 18px; }
+  .confirm-detail { background: #f8f9fa; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 14px; line-height: 1.6; }
+  .confirm-detail strong { color: #333; }
+  .confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 300;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-success { background: #4caf50; }
+  .toast-error { background: #e53935; }
+
+  /* Search */
+  .search-box {
+    padding: 6px 12px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 13px;
+    width: 180px;
+    transition: all 0.2s;
+  }
+  .search-box::placeholder { color: rgba(255,255,255,0.6); }
+  .search-box:focus { outline: none; background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.5); width: 220px; }
+
+  /* History modal */
+  .history-list { max-height: 60vh; overflow-y: auto; }
+  .history-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .history-item-header {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+  }
+  .history-item-header:hover { background: #f0f0f0; }
+  .history-date { font-size: 14px; font-weight: 600; color: #333; }
+  .history-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .history-type-initial { background: #e3f2fd; color: #1565c0; }
+  .history-type-follow { background: #fff3e0; color: #e65100; }
+  .history-item-body {
+    padding: 16px;
+    display: none;
+  }
+  .history-item-body.open { display: block; }
+  .history-subject {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+  }
+  .history-body-text {
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 14px;
+  }
+  .history-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+  }
+  .btn-history {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+  .btn-history:hover { background: #e1bee7; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+  .empty-state p { font-size: 16px; margin-bottom: 8px; }
+  .empty-state small { font-size: 13px; }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-top: 10px;
+  }
+  .tab-btn {
+    padding: 8px 20px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+  }
+  .tab-btn:first-child { border-radius: 6px 0 0 0; }
+  .tab-btn:last-child { border-radius: 0 6px 0 0; }
+  .tab-btn:hover { background: rgba(255,255,255,0.25); }
+  .tab-btn.active {
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+
+  /* Scraping panel */
+  .scrape-panel {
+    padding: 24px;
+    max-width: 720px;
+    margin: 24px auto;
+  }
+  .scrape-panel-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .scrape-panel-header {
+    background: #f8f9fa;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .scrape-panel-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .scrape-panel-header p {
+    font-size: 13px;
+    color: #888;
+  }
+  .scrape-panel-body {
+    padding: 24px;
+  }
+  .scrape-form-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .scrape-form-group {
+    flex: 1;
+    min-width: 140px;
+  }
+  .scrape-form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+  }
+  .scrape-form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    transition: border-color 0.2s;
+  }
+  .scrape-form-group select:focus {
+    outline: none;
+    border-color: #e65100;
+    box-shadow: 0 0 0 3px rgba(230,81,0,0.1);
+  }
+  .btn-scrape {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-scrape:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,101,192,0.4); }
+  .btn-scrape:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .scrape-note {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #999;
+    padding: 10px 14px;
+    background: #fff8e1;
+    border-radius: 8px;
+    border: 1px solid #fff3c4;
+  }
+  .scrape-progress {
+    margin-top: 24px;
+    text-align: center;
+    display: none;
+  }
+  .scrape-progress.show { display: block; }
+  .scrape-progress p {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #666;
+  }
+  .scrape-result {
+    margin-top: 24px;
+    display: none;
+  }
+  .scrape-result.show { display: block; }
+  .scrape-result-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .scrape-result-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .scrape-result-icon.success { background: #e8f5e9; color: #2e7d32; }
+  .scrape-result-icon.error { background: #fce4ec; color: #c62828; }
+  .scrape-result-title { font-size: 16px; font-weight: 600; }
+  .scrape-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .scrape-stat {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .scrape-stat .num { font-size: 24px; font-weight: 700; color: #e65100; }
+  .scrape-stat .label { font-size: 12px; color: #888; margin-top: 2px; }
+  .scrape-log {
+    margin-top: 12px;
+  }
+  .scrape-log summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+    padding: 8px 0;
+  }
+  .scrape-log pre {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    border: 1px solid #e0e0e0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header { padding: 12px 16px; }
+    .header h1 { font-size: 16px; }
+    .list-view { padding: 12px; }
+    .card-view { padding: 12px; }
+    .card-body { padding: 16px; }
+    .td-subject { max-width: 150px; }
+    .search-box { width: 120px; }
+    .search-box:focus { width: 160px; }
+    .card-info-grid { grid-template-columns: 1fr; }
+    .scrape-panel { padding: 12px; }
+    .scrape-form-row { flex-direction: column; }
+    .scrape-form-group { min-width: 100%; }
+    .btn-scrape { width: 100%; }
+    .tab-btn { font-size: 13px; padding: 8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <h1>ライフアート 営業リスト管理</h1>
+    <div class="header-controls">
+      <input type="text" class="search-box" id="searchBox" placeholder="検索..." onkeyup="applyFilters()">
+      <span class="filter-divider">|</span>
+      <button class="btn btn-view active" id="btnList" onclick="setView('list')">一覧</button>
+      <button class="btn btn-view" id="btnCard" onclick="setView('card')">カード</button>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tabLeads" onclick="switchTab('leads')">リード管理</button>
+    <button class="tab-btn" id="tabScrape" onclick="switchTab('scrape')">スクレイピング</button>
+  </div>
+  <div class="filter-row" id="filterRow">
+    <span class="filter-label">ステータス:</span>
+    <button class="btn btn-filter active" data-filter="all" onclick="setFilter('all')">全件</button>
+    <button class="btn btn-filter" data-filter="未送信" onclick="setFilter('未送信')">未送信</button>
+    <button class="btn btn-filter" data-filter="下書き済" onclick="setFilter('下書き済')">下書き済</button>
+    <button class="btn btn-filter" data-filter="送信許可" onclick="setFilter('送信許可')">送信許可</button>
+    <button class="btn btn-filter" data-filter="送信済み" onclick="setFilter('送信済み')">送信済み</button>
+    <span class="filter-divider">|</span>
+    <span class="filter-label">業種:</span>
+    <button class="btn btn-filter active" data-category="all" onclick="setCategoryFilter('all')">全業種</button>
+    <button class="btn btn-filter" data-category="ゼネコン" onclick="setCategoryFilter('ゼネコン')">ゼネコン</button>
+    <button class="btn btn-filter" data-category="不動産" onclick="setCategoryFilter('不動産')">不動産</button>
+    <button class="btn btn-filter" data-category="設計事務所" onclick="setCategoryFilter('設計事務所')">設計事務所</button>
+    <button class="btn btn-filter" data-category="ハウスメーカー" onclick="setCategoryFilter('ハウスメーカー')">ハウスメーカー</button>
+  </div>
+  <div class="progress-section">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+    <div class="progress-text" id="progressText">読み込み中...</div>
+  </div>
+</div>
+
+<div class="bulk-bar" id="bulkBar">
+  <span id="bulkCount">0件選択中</span>
+  <button class="btn btn-approve" onclick="bulkApproveSelected()">選択を送信許可</button>
+  <button class="btn btn-send" onclick="bulkSendSelected()">選択を一括送信</button>
+  <button class="btn btn-secondary" onclick="clearSelection()">選択解除</button>
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p>データを読み込んでいます...</p>
+</div>
+
+<div class="list-view" id="listView" style="display:none;">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="check-col"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+          <th>#</th>
+          <th>会社名</th>
+          <th>宛名</th>
+          <th>業種</th>
+          <th>メール</th>
+          <th>件名</th>
+          <th>ステータス</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card-view" id="cardView" style="display:none;">
+  <div class="card-nav">
+    <button class="btn btn-secondary" id="btnPrev" onclick="prevCard()">前へ</button>
+    <span class="card-nav-info" id="cardNavInfo">1 / 0</span>
+    <button class="btn btn-secondary" id="btnNext" onclick="nextCard()">次へ</button>
+  </div>
+  <div class="card" id="cardContent"></div>
+</div>
+
+<div class="scrape-panel" id="scrapePanel" style="display:none;">
+  <div class="scrape-panel-card">
+    <div class="scrape-panel-header">
+      <h2>企業情報スクレイピング</h2>
+      <p>Google Maps APIから企業を検索し、HPからメールアドレス・代表者名を取得します</p>
+    </div>
+    <div class="scrape-panel-body">
+      <div class="scrape-form-row">
+        <div class="scrape-form-group">
+          <label>エリア</label>
+          <select id="scrapeArea">
+            <option value="東京都">東京都</option>
+            <option value="神奈川県">神奈川県</option>
+            <option value="千葉県">千葉県</option>
+            <option value="埼玉県">埼玉県</option>
+          </select>
+        </div>
+        <div class="scrape-form-group">
+          <label>業種カテゴリ</label>
+          <select id="scrapeCategory">
+            <option value="ゼネコン">ゼネコン</option>
+            <option value="不動産">不動産</option>
+            <option value="設計事務所">設計事務所</option>
+            <option value="ハウスメーカー">ハウスメーカー</option>
+          </select>
+        </div>
+        <button class="btn-scrape" id="btnScrape" onclick="startScraping()">スクレイピング開始</button>
+      </div>
+      <div class="scrape-note">
+        1回の実行につき1エリア×1カテゴリが推奨です（処理時間: 約2〜3分）
+      </div>
+
+      <div class="scrape-progress" id="scrapeProgress">
+        <div class="spinner" style="margin:0 auto;"></div>
+        <p id="scrapeProgressText">スクレイピング実行中... しばらくお待ちください</p>
+      </div>
+
+      <div class="scrape-result" id="scrapeResult">
+        <div class="scrape-result-header">
+          <div class="scrape-result-icon" id="scrapeResultIcon"></div>
+          <span class="scrape-result-title" id="scrapeResultTitle"></span>
+        </div>
+        <div class="scrape-stats" id="scrapeStats"></div>
+        <div class="scrape-log" id="scrapeLog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">メール編集</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>件名</label>
+        <input type="text" id="editSubject">
+      </div>
+      <div class="form-group">
+        <label>本文</label>
+        <textarea id="editBody"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-primary" id="btnSave" onclick="saveEmail()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirmDialog">
+  <div class="confirm-box">
+    <h3>メール送信確認</h3>
+    <div class="confirm-detail" id="confirmDetail"></div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="closeConfirm()">キャンセル</button>
+      <button class="btn btn-send" id="btnConfirmSend" onclick="confirmSend()">送信する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="historyTitle">送信履歴</h2>
+      <button class="modal-close" onclick="closeHistory()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="history-list" id="historyList">
+        <div class="history-loading">読み込み中...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeHistory()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var allLeads = [];
+  var filtered = [];
+  var currentView = 'list';
+  var currentFilter = 'all';
+  var currentCategory = 'all';
+  var cardIndex = 0;
+  var editingRow = null;
+  var selectedRows = {};
+  var pendingSendIndex = null;
+  var currentTab = 'leads';
+
+  window.addEventListener('load', function() {
+    loadData();
+  });
+
+  function loadData() {
+    google.script.run
+      .withSuccessHandler(function(data) {
+        allLeads = data;
+        applyFilters();
+        document.getElementById('loading').style.display = 'none';
+        showCurrentView();
+        updateProgress();
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('loading').innerHTML = '<p style="color:#e53935;">エラー: ' + err.message + '</p>';
+      })
+      .getLeads();
+  }
+
+  function setFilter(f) {
+    currentFilter = f;
+    var btns = document.querySelectorAll('.btn-filter[data-filter]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].getAttribute('data-filter') === f);
+    }
+    applyFilters();
+  }
+
+  function setCategoryFilter(cat) {
+    currentCategory = cat;
+    var btns = document.querySelectorAll('.btn-filter[data-category]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].getAttribute('data-category') === cat);
+    }
+    applyFilters();
+  }
+
+  function applyFilters() {
+    var q = document.getElementById('searchBox').value.toLowerCase();
+    filtered = [];
+    for (var i = 0; i < allLeads.length; i++) {
+      var c = allLeads[i];
+      if (currentFilter !== 'all' && c.status !== currentFilter) continue;
+      if (currentCategory !== 'all' && c.category !== currentCategory) continue;
+      if (q) {
+        var text = (c.company + ' ' + c.category + ' ' + c.representative + ' ' + c.email + ' ' + c.subject + ' ' + c.address).toLowerCase();
+        if (text.indexOf(q) === -1) continue;
+      }
+      filtered.push(c);
+    }
+    cardIndex = 0;
+    renderCurrentView();
+  }
+
+  function setView(v) {
+    currentView = v;
+    document.getElementById('btnList').classList.toggle('active', v === 'list');
+    document.getElementById('btnCard').classList.toggle('active', v === 'card');
+    showCurrentView();
+  }
+
+  function showCurrentView() {
+    var isLeads = currentTab === 'leads';
+    document.getElementById('listView').style.display = isLeads && currentView === 'list' ? 'block' : 'none';
+    document.getElementById('cardView').style.display = isLeads && currentView === 'card' ? 'block' : 'none';
+    document.getElementById('scrapePanel').style.display = currentTab === 'scrape' ? 'block' : 'none';
+    if (isLeads) renderCurrentView();
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tabLeads').classList.toggle('active', tab === 'leads');
+    document.getElementById('tabScrape').classList.toggle('active', tab === 'scrape');
+    // フィルター行とプログレスバーの表示切り替え
+    document.getElementById('filterRow').style.display = tab === 'leads' ? 'flex' : 'none';
+    document.querySelector('.progress-section').style.display = tab === 'leads' ? 'block' : 'none';
+    document.getElementById('bulkBar').classList.remove('show');
+    // ヘッダーコントロール（検索・ビュー切り替え）
+    document.querySelector('.header-controls').style.display = tab === 'leads' ? 'flex' : 'none';
+    showCurrentView();
+  }
+
+  function renderCurrentView() {
+    if (currentView === 'list') renderList();
+    else renderCard();
+  }
+
+  function getStatusClass(status) {
+    if (status === '送信許可') return 'status-approved';
+    if (status === '送信済み') return 'status-sent';
+    if (status === 'エラー') return 'status-error';
+    if (status === '下書き済') return 'status-draft';
+    return 'status-unsent';
+  }
+
+  function getCategoryClass(cat) {
+    return 'cat-' + (cat || '');
+  }
+
+  function renderList() {
+    var tbody = document.getElementById('tableBody');
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">該当するデータがありません</td></tr>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < filtered.length; i++) {
+      var c = filtered[i];
+      var globalIdx = allLeads.indexOf(c) + 1;
+      var statusClass = getStatusClass(c.status);
+      var catClass = getCategoryClass(c.category);
+      var statusLabel = c.status || '未送信';
+      var checked = selectedRows[c.row] ? 'checked' : '';
+      var isSent = c.status === '送信済み';
+      var hasEmail = !!c.email;
+
+      var actions = '';
+      if (isSent) {
+        actions = '<button class="btn btn-history" onclick="event.stopPropagation();openHistory(' + i + ')">履歴</button>';
+      } else {
+        actions = '<button class="btn btn-secondary" style="font-size:12px;padding:4px 10px;" onclick="event.stopPropagation();openEdit(' + i + ')">編集</button>';
+        if (hasEmail && c.subject && c.body) {
+          actions += ' <button class="btn btn-send" style="font-size:12px;padding:4px 10px;" onclick="event.stopPropagation();openSendConfirm(' + i + ')">送信</button>';
+        }
+        if (c.followCount > 0) {
+          actions += ' <button class="btn btn-history" onclick="event.stopPropagation();openHistory(' + i + ')">履歴</button>';
+        }
+      }
+
+      html += '<tr onclick="openCard(' + i + ')">';
+      html += '<td class="check-col" onclick="event.stopPropagation()"><input type="checkbox" ' + checked + ' ' + (isSent ? 'disabled' : '') + ' onchange="toggleSelect(' + c.row + ', this)"></td>';
+      html += '<td class="td-num">' + globalIdx + '</td>';
+      html += '<td class="td-company">' + htmlEscape(c.company) + '</td>';
+      html += '<td class="td-name" style="white-space:nowrap;">' + htmlEscape(c.displayName || 'ご担当者様') + '</td>';
+      html += '<td class="td-category"><span class="category-badge ' + catClass + '">' + htmlEscape(c.category || '-') + '</span></td>';
+      html += '<td class="td-email">' + htmlEscape(c.email || '-') + '</td>';
+      html += '<td class="td-subject">' + htmlEscape(c.subject || '-') + '</td>';
+      html += '<td class="td-status"><span class="status-badge ' + statusClass + '">' + htmlEscape(statusLabel) + '</span></td>';
+      html += '<td class="td-actions">' + actions + '</td>';
+      html += '</tr>';
+    }
+    tbody.innerHTML = html;
+    updateBulkBar();
+  }
+
+  function renderCard() {
+    if (filtered.length === 0) {
+      document.getElementById('cardContent').innerHTML = '<div class="empty-state"><p>該当するデータがありません</p><small>フィルター条件を変更してください</small></div>';
+      document.getElementById('cardNavInfo').textContent = '0 / 0';
+      return;
+    }
+    if (cardIndex >= filtered.length) cardIndex = filtered.length - 1;
+    if (cardIndex < 0) cardIndex = 0;
+
+    var c = filtered[cardIndex];
+    var statusClass = getStatusClass(c.status);
+    var statusLabel = c.status || '未送信';
+    var catClass = getCategoryClass(c.category);
+    var globalIdx = allLeads.indexOf(c) + 1;
+    var isSent = c.status === '送信済み';
+
+    var footerBtn = '';
+    if (isSent) {
+      footerBtn = '<div style="display:flex;gap:8px;align-items:center;">';
+      footerBtn += '<span style="font-size:15px;color:#1565c0;font-weight:500;">送信完了</span>';
+      footerBtn += '<button class="btn btn-history" style="padding:10px 20px;font-size:14px;" onclick="openHistory(' + cardIndex + ')">送信履歴を見る</button>';
+      footerBtn += '</div>';
+    } else {
+      footerBtn = '<div style="display:flex;gap:8px;">';
+      if (c.followCount > 0) {
+        footerBtn += '<button class="btn btn-history" style="padding:12px 20px;font-size:14px;" onclick="openHistory(' + cardIndex + ')">履歴</button>';
+      }
+      footerBtn += '<button class="btn btn-secondary" style="padding:12px 24px;font-size:15px;" onclick="openEdit(' + cardIndex + ')">編集</button>';
+      if (c.email && c.subject && c.body) {
+        footerBtn += '<button class="btn-send-lg" onclick="openSendConfirm(' + cardIndex + ')">送信</button>';
+      }
+      footerBtn += '</div>';
+    }
+
+    var html = '<div class="card-header">';
+    html += '<div class="card-company">' + htmlEscape(c.company) + '</div>';
+    html += '<div class="card-meta">';
+    html += '<span>' + htmlEscape(c.displayName || 'ご担当者様') + '</span>';
+    if (c.address) html += '<span>' + htmlEscape(c.address) + '</span>';
+    if (c.email) html += '<span>' + htmlEscape(c.email) + '</span>';
+    html += '</div>';
+    if (c.category) html += '<div class="card-category"><span class="category-badge ' + catClass + '">' + htmlEscape(c.category) + '</span></div>';
+    html += '</div>';
+
+    html += '<div class="card-body">';
+
+    // 企業情報グリッド
+    html += '<div class="card-info-grid">';
+    html += '<div class="card-info-item"><div class="label">TEL</div><div class="value">' + htmlEscape(c.tel || '-') + '</div></div>';
+    html += '<div class="card-info-item"><div class="label">HP</div><div class="value">' + (c.hpUrl ? '<a href="' + htmlEscape(c.hpUrl) + '" target="_blank" style="color:#e65100;">' + htmlEscape(c.hpUrl) + '</a>' : '-') + '</div></div>';
+    html += '<div class="card-info-item"><div class="label">取得元</div><div class="value">' + htmlEscape(c.source || '-') + '</div></div>';
+    html += '<div class="card-info-item"><div class="label">取得日</div><div class="value">' + htmlEscape(c.scrapedDate || '-') + '</div></div>';
+    html += '</div>';
+
+    // メール件名
+    html += '<div class="card-section"><div class="card-section-header"><span class="card-section-title">件名</span></div>';
+    html += '<div class="card-subject">' + htmlEscape(c.subject || '（未作成）') + '</div></div>';
+
+    // メール本文
+    html += '<div class="card-section"><div class="card-section-header"><span class="card-section-title">本文</span></div>';
+    html += '<div class="card-email-body">' + htmlEscape(c.body || '（未作成）') + '</div></div>';
+
+    // 営業情報
+    if (c.phase || c.nextAction || c.reaction) {
+      html += '<div class="card-info-grid">';
+      html += '<div class="card-info-item"><div class="label">営業フェーズ</div><div class="value">' + htmlEscape(c.phase || 'リード') + '</div></div>';
+      html += '<div class="card-info-item"><div class="label">次のアクション</div><div class="value">' + htmlEscape(c.nextAction || '-') + '</div></div>';
+      if (c.reaction) html += '<div class="card-info-item"><div class="label">反応</div><div class="value">' + htmlEscape(c.reaction) + '</div></div>';
+      if (c.sentDate) html += '<div class="card-info-item"><div class="label">送信日</div><div class="value">' + htmlEscape(c.sentDate) + '</div></div>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+
+    html += '<div class="card-footer">';
+    html += '<div class="card-status-area"><span class="status-badge ' + statusClass + '">' + htmlEscape(statusLabel) + '</span><span style="font-size:13px;color:#999;">#' + globalIdx + '</span></div>';
+    html += footerBtn;
+    html += '</div>';
+
+    document.getElementById('cardContent').innerHTML = html;
+    document.getElementById('cardNavInfo').textContent = (cardIndex + 1) + ' / ' + filtered.length;
+    document.getElementById('btnPrev').disabled = cardIndex === 0;
+    document.getElementById('btnNext').disabled = cardIndex >= filtered.length - 1;
+  }
+
+  function openCard(i) {
+    cardIndex = i;
+    setView('card');
+  }
+
+  function prevCard() {
+    if (cardIndex > 0) { cardIndex--; renderCard(); }
+  }
+
+  function nextCard() {
+    if (cardIndex < filtered.length - 1) { cardIndex++; renderCard(); }
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (document.getElementById('editModal').classList.contains('show')) return;
+    if (document.getElementById('confirmDialog').classList.contains('show')) return;
+    if (currentView === 'card') {
+      if (e.key === 'ArrowLeft') prevCard();
+      if (e.key === 'ArrowRight') nextCard();
+    }
+  });
+
+  function openEdit(i) {
+    var c = filtered[i];
+    editingRow = c.row;
+    document.getElementById('modalTitle').textContent = htmlEscape(c.company) + ' - ' + htmlEscape(c.displayName || 'ご担当者様');
+    document.getElementById('editSubject').value = c.subject || '';
+    document.getElementById('editBody').value = c.body || '';
+    document.getElementById('editModal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('editModal').classList.remove('show');
+    editingRow = null;
+  }
+
+  function saveEmail() {
+    var subject = document.getElementById('editSubject').value;
+    var body = document.getElementById('editBody').value;
+    var row = editingRow;
+    var btn = document.getElementById('btnSave');
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        for (var i = 0; i < allLeads.length; i++) {
+          if (allLeads[i].row === row) {
+            allLeads[i].subject = subject;
+            allLeads[i].body = body;
+            if (allLeads[i].status === '未送信') allLeads[i].status = '下書き済';
+            break;
+          }
+        }
+        closeModal();
+        applyFilters();
+        updateProgress();
+        showToast(res.message, 'success');
+        btn.disabled = false;
+        btn.textContent = '保存';
+      })
+      .withFailureHandler(function(err) {
+        showToast('エラー: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '保存';
+      })
+      .updateEmail(row, subject, body);
+  }
+
+  function openSendConfirm(i) {
+    var c = filtered[i];
+    pendingSendIndex = i;
+    var detail = '<strong>宛先:</strong> ' + htmlEscape(c.email) + '<br>';
+    detail += '<strong>会社:</strong> ' + htmlEscape(c.company) + ' / ' + htmlEscape(c.displayName || 'ご担当者様') + '<br>';
+    detail += '<strong>件名:</strong> ' + htmlEscape(c.subject);
+    document.getElementById('confirmDetail').innerHTML = detail;
+    document.getElementById('confirmDialog').classList.add('show');
+    document.getElementById('btnConfirmSend').disabled = false;
+    document.getElementById('btnConfirmSend').textContent = '送信する';
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirmDialog').classList.remove('show');
+    pendingSendIndex = null;
+  }
+
+  function confirmSend() {
+    if (pendingSendIndex === null) return;
+    var c = filtered[pendingSendIndex];
+    var btn = document.getElementById('btnConfirmSend');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res.success) {
+          for (var i = 0; i < allLeads.length; i++) {
+            if (allLeads[i].row === c.row) {
+              allLeads[i].status = '送信済み';
+              break;
+            }
+          }
+          applyFilters();
+          updateProgress();
+          showToast(res.message, 'success');
+          closeConfirm();
+          if (currentView === 'card' && cardIndex < filtered.length - 1) {
+            setTimeout(function() { nextCard(); }, 500);
+          }
+        } else {
+          showToast(res.message, 'error');
+          btn.disabled = false;
+          btn.textContent = '送信する';
+        }
+      })
+      .withFailureHandler(function(err) {
+        showToast('エラー: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '送信する';
+      })
+      .sendEmail(c.row);
+  }
+
+  function toggleSelect(row, el) {
+    if (el.checked) {
+      selectedRows[row] = true;
+    } else {
+      delete selectedRows[row];
+    }
+    updateBulkBar();
+  }
+
+  function toggleAll(el) {
+    if (el.checked) {
+      for (var i = 0; i < filtered.length; i++) {
+        if (filtered[i].status !== '送信済み') {
+          selectedRows[filtered[i].row] = true;
+        }
+      }
+    } else {
+      selectedRows = {};
+    }
+    renderList();
+  }
+
+  function clearSelection() {
+    selectedRows = {};
+    document.getElementById('checkAll').checked = false;
+    renderList();
+  }
+
+  function updateBulkBar() {
+    var keys = Object.keys(selectedRows);
+    var count = keys.length;
+    var bar = document.getElementById('bulkBar');
+    if (count > 0) {
+      bar.classList.add('show');
+      document.getElementById('bulkCount').textContent = count + '件選択中';
+    } else {
+      bar.classList.remove('show');
+    }
+  }
+
+  function bulkApproveSelected() {
+    var rows = [];
+    for (var key in selectedRows) rows.push(Number(key));
+    if (rows.length === 0) return;
+    if (!confirm(rows.length + '件を「送信許可」に変更しますか？')) return;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        for (var r = 0; r < rows.length; r++) {
+          for (var i = 0; i < allLeads.length; i++) {
+            if (allLeads[i].row === rows[r] && allLeads[i].status !== '送信済み') {
+              allLeads[i].status = '送信許可';
+              break;
+            }
+          }
+        }
+        selectedRows = {};
+        document.getElementById('checkAll').checked = false;
+        applyFilters();
+        updateProgress();
+        showToast(res.message, 'success');
+      })
+      .withFailureHandler(function(err) {
+        showToast('エラー: ' + err.message, 'error');
+      })
+      .bulkApprove(rows);
+  }
+
+  function bulkSendSelected() {
+    var rows = [];
+    for (var key in selectedRows) rows.push(Number(key));
+    if (rows.length === 0) return;
+    if (!confirm(rows.length + '件のメールを一括送信しますか？\nこの操作は取り消せません。')) return;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        for (var r = 0; r < rows.length; r++) {
+          for (var i = 0; i < allLeads.length; i++) {
+            if (allLeads[i].row === rows[r]) {
+              allLeads[i].status = '送信済み';
+              break;
+            }
+          }
+        }
+        selectedRows = {};
+        document.getElementById('checkAll').checked = false;
+        applyFilters();
+        updateProgress();
+        showToast(res.message, 'success');
+      })
+      .withFailureHandler(function(err) {
+        showToast('エラー: ' + err.message, 'error');
+      })
+      .bulkSend(rows);
+  }
+
+  function updateProgress() {
+    var total = allLeads.length;
+    var sent = 0;
+    var draft = 0;
+    var approved = 0;
+    var unsent = 0;
+    var withEmail = 0;
+
+    for (var i = 0; i < allLeads.length; i++) {
+      var s = allLeads[i].status;
+      if (s === '送信済み') sent++;
+      else if (s === '送信許可') approved++;
+      else if (s === '下書き済') draft++;
+      else unsent++;
+      if (allLeads[i].email) withEmail++;
+    }
+
+    var pct = total > 0 ? Math.round(sent / total * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent =
+      '全' + total + '件 | メール有: ' + withEmail + '件 | 送信済: ' + sent + '件 (' + pct + '%) | 送信許可: ' + approved + '件 | 下書き: ' + draft + '件 | 未送信: ' + unsent + '件';
+  }
+
+  function htmlEscape(s) {
+    if (!s) return '';
+    var div = document.createElement('div');
+    div.textContent = String(s);
+    return div.innerHTML;
+  }
+
+  // --- 送信履歴 ---
+
+  function openHistory(i) {
+    var c = filtered[i];
+    document.getElementById('historyTitle').textContent = htmlEscape(c.company) + ' の送信履歴';
+    document.getElementById('historyList').innerHTML = '<div class="history-loading"><div class="spinner" style="margin:0 auto;width:30px;height:30px;border-width:3px;"></div><p style="margin-top:12px;">読み込み中...</p></div>';
+    document.getElementById('historyModal').classList.add('show');
+
+    google.script.run
+      .withSuccessHandler(function(history) {
+        renderHistory(history);
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('historyList').innerHTML = '<div class="history-empty">履歴の読み込みに失敗しました: ' + htmlEscape(err.message) + '</div>';
+      })
+      .getSendHistory(c.row);
+  }
+
+  function closeHistory() {
+    document.getElementById('historyModal').classList.remove('show');
+  }
+
+  function renderHistory(history) {
+    var container = document.getElementById('historyList');
+
+    if (!history || history.length === 0) {
+      container.innerHTML = '<div class="history-empty">送信履歴はありません</div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+      var h = history[i];
+      var typeClass = h.sendType === '初回' ? 'history-type-initial' : 'history-type-follow';
+      var typeLabel = h.sendType || '送信';
+      if (h.followNum > 1) typeLabel += '（' + h.followNum + '回目）';
+
+      html += '<div class="history-item">';
+      html += '<div class="history-item-header" onclick="toggleHistoryItem(this)">';
+      html += '<div>';
+      html += '<span class="history-date">' + htmlEscape(h.sentDate) + '</span>';
+      html += ' <span class="history-type ' + typeClass + '">' + htmlEscape(typeLabel) + '</span>';
+      html += '</div>';
+      html += '<span style="font-size:12px;color:#999;">' + htmlEscape(h.displayName) + ' → ' + htmlEscape(h.email) + '</span>';
+      html += '</div>';
+      html += '<div class="history-item-body' + (i === 0 ? ' open' : '') + '">';
+      html += '<div style="font-size:12px;color:#999;margin-bottom:6px;">件名:</div>';
+      html += '<div class="history-subject">' + htmlEscape(h.subject) + '</div>';
+      html += '<div style="font-size:12px;color:#999;margin-bottom:6px;">本文:</div>';
+      html += '<div class="history-body-text">' + htmlEscape(h.body) + '</div>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  function toggleHistoryItem(headerEl) {
+    var body = headerEl.nextElementSibling;
+    body.classList.toggle('open');
+  }
+
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast toast-' + type + ' show';
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  // --- スクレイピング ---
+
+  function startScraping() {
+    var area = document.getElementById('scrapeArea').value;
+    var category = document.getElementById('scrapeCategory').value;
+
+    if (!confirm(area + ' × ' + category + ' でスクレイピングを実行しますか？\n処理には2〜3分かかります。')) {
+      return;
+    }
+
+    var btn = document.getElementById('btnScrape');
+    btn.disabled = true;
+    btn.textContent = '実行中...';
+
+    document.getElementById('scrapeResult').classList.remove('show');
+    document.getElementById('scrapeProgress').classList.add('show');
+    document.getElementById('scrapeProgressText').textContent =
+      area + ' × ' + category + ' を検索中... しばらくお待ちください';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'スクレイピング開始';
+        document.getElementById('scrapeProgress').classList.remove('show');
+        showScrapingResult(res);
+
+        // リード管理のデータを再読み込み
+        if (res.success && res.total > 0) {
+          loadData();
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'スクレイピング開始';
+        document.getElementById('scrapeProgress').classList.remove('show');
+        showScrapingResult({
+          success: false,
+          message: 'エラー: ' + err.message,
+          total: 0,
+          emailCount: 0,
+          repCount: 0,
+          elapsed: 0,
+          log: ['エラー: ' + err.message],
+        });
+      })
+      .runScraping(area, category);
+  }
+
+  function showScrapingResult(res) {
+    var resultDiv = document.getElementById('scrapeResult');
+    resultDiv.classList.add('show');
+
+    // アイコンとタイトル
+    var icon = document.getElementById('scrapeResultIcon');
+    var title = document.getElementById('scrapeResultTitle');
+
+    if (res.success) {
+      icon.className = 'scrape-result-icon success';
+      icon.textContent = '\u2713';
+      title.textContent = 'スクレイピング完了';
+    } else {
+      icon.className = 'scrape-result-icon error';
+      icon.textContent = '!';
+      title.textContent = 'エラー';
+    }
+
+    // 統計情報
+    var statsDiv = document.getElementById('scrapeStats');
+    if (res.total > 0) {
+      var emailRate = res.total > 0 ? Math.round(res.emailCount / res.total * 100) : 0;
+      var repRate = res.total > 0 ? Math.round(res.repCount / res.total * 100) : 0;
+      statsDiv.innerHTML =
+        '<div class="scrape-stat"><div class="num">' + res.total + '</div><div class="label">取得企業数</div></div>' +
+        '<div class="scrape-stat"><div class="num">' + res.emailCount + '/' + res.total + '</div><div class="label">メール取得 (' + emailRate + '%)</div></div>' +
+        '<div class="scrape-stat"><div class="num">' + res.repCount + '/' + res.total + '</div><div class="label">代表者名取得 (' + repRate + '%)</div></div>' +
+        '<div class="scrape-stat"><div class="num">' + res.elapsed + '</div><div class="label">処理時間（秒）</div></div>';
+    } else {
+      statsDiv.innerHTML = '<p style="color:#888;font-size:14px;">' + htmlEscape(res.message) + '</p>';
+    }
+
+    // ログ
+    var logDiv = document.getElementById('scrapeLog');
+    if (res.log && res.log.length > 0) {
+      logDiv.innerHTML = '<details><summary>実行ログ (' + res.log.length + '行)</summary><pre>' + htmlEscape(res.log.join('\n')) + '</pre></details>';
+    } else {
+      logDiv.innerHTML = '';
+    }
+  }
+</script>
+</body>
+</html>

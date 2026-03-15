@@ -1,0 +1,581 @@
+// OmniForce CRM - Prisma Schema
+// Salesforce完全互換のCRMシステム
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ======================================
+// 認証・ユーザー管理
+// ======================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  isActive      Boolean   @default(true)
+  profileId     String?
+  roleId        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  profile       Profile?   @relation(fields: [profileId], references: [id])
+  role          Role?      @relation(fields: [roleId], references: [id])
+  sessions      Session[]
+
+  // 所有レコード
+  ownedAccounts     Account[]
+  ownedContacts     Contact[]
+  ownedOpportunities Opportunity[]
+  ownedLeads        Lead[]
+  ownedCases        Case[]
+  ownedTasks        Task[]
+  ownedCustomRecords CustomRecord[]
+
+  // 作成・更新履歴
+  createdAccounts     Account[]     @relation("AccountCreatedBy")
+  updatedAccounts     Account[]     @relation("AccountUpdatedBy")
+  createdContacts     Contact[]     @relation("ContactCreatedBy")
+  updatedContacts     Contact[]     @relation("ContactUpdatedBy")
+  createdOpportunities Opportunity[] @relation("OpportunityCreatedBy")
+  updatedOpportunities Opportunity[] @relation("OpportunityUpdatedBy")
+
+  activities    Activity[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ======================================
+// 権限管理（プロファイル・ロール）
+// ======================================
+
+model Profile {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users             User[]
+  objectPermissions ObjectPermission[]
+  fieldPermissions  FieldPermission[]
+
+  @@map("profiles")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  parentId    String?
+  level       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent   Role?  @relation("RoleHierarchy", fields: [parentId], references: [id])
+  children Role[] @relation("RoleHierarchy")
+  users    User[]
+
+  @@map("roles")
+}
+
+model ObjectPermission {
+  id             String  @id @default(cuid())
+  profileId      String
+  objectApiName  String
+  canCreate      Boolean @default(false)
+  canRead        Boolean @default(false)
+  canUpdate      Boolean @default(false)
+  canDelete      Boolean @default(false)
+  viewAllRecords Boolean @default(false)
+  modifyAllRecords Boolean @default(false)
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, objectApiName])
+  @@map("object_permissions")
+}
+
+model FieldPermission {
+  id            String  @id @default(cuid())
+  profileId     String
+  objectApiName String
+  fieldApiName  String
+  canRead       Boolean @default(false)
+  canEdit       Boolean @default(false)
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, objectApiName, fieldApiName])
+  @@map("field_permissions")
+}
+
+// ======================================
+// 標準オブジェクト
+// ======================================
+
+model Account {
+  id            String   @id @default(cuid())
+  name          String
+  industry      String?
+  type          String?
+  phone         String?
+  fax           String?
+  website       String?
+  description   String?
+  billingStreet String?
+  billingCity   String?
+  billingState  String?
+  billingPostalCode String?
+  billingCountry String?
+  shippingStreet String?
+  shippingCity   String?
+  shippingState  String?
+  shippingPostalCode String?
+  shippingCountry String?
+  annualRevenue  Float?
+  numberOfEmployees Int?
+
+  ownerId       String
+  createdById   String
+  updatedById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // カスタム項目用
+  customFields  Json?    @db.JsonB
+
+  owner         User     @relation(fields: [ownerId], references: [id])
+  createdBy     User     @relation("AccountCreatedBy", fields: [createdById], references: [id])
+  updatedBy     User     @relation("AccountUpdatedBy", fields: [updatedById], references: [id])
+
+  contacts      Contact[]
+  opportunities Opportunity[]
+  cases         Case[]
+  activities    Activity[]
+
+  @@map("accounts")
+}
+
+model Contact {
+  id            String   @id @default(cuid())
+  firstName     String?
+  lastName      String
+  email         String?
+  phone         String?
+  mobilePhone   String?
+  title         String?
+  department    String?
+  birthdate     DateTime?
+  description   String?
+  mailingStreet String?
+  mailingCity   String?
+  mailingState  String?
+  mailingPostalCode String?
+  mailingCountry String?
+
+  accountId     String?
+  ownerId       String
+  createdById   String
+  updatedById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customFields  Json?    @db.JsonB
+
+  account       Account? @relation(fields: [accountId], references: [id])
+  owner         User     @relation(fields: [ownerId], references: [id])
+  createdBy     User     @relation("ContactCreatedBy", fields: [createdById], references: [id])
+  updatedBy     User     @relation("ContactUpdatedBy", fields: [updatedById], references: [id])
+
+  opportunities OpportunityContact[]
+  cases         Case[]
+  activities    Activity[]
+
+  @@map("contacts")
+}
+
+model Opportunity {
+  id            String   @id @default(cuid())
+  name          String
+  amount        Float?
+  probability   Int?
+  stage         String   @default("Prospecting")
+  type          String?
+  leadSource    String?
+  closeDate     DateTime
+  description   String?
+  nextStep      String?
+  isClosed      Boolean  @default(false)
+  isWon         Boolean  @default(false)
+
+  accountId     String?
+  ownerId       String
+  createdById   String
+  updatedById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customFields  Json?    @db.JsonB
+
+  account       Account? @relation(fields: [accountId], references: [id])
+  owner         User     @relation(fields: [ownerId], references: [id])
+  createdBy     User     @relation("OpportunityCreatedBy", fields: [createdById], references: [id])
+  updatedBy     User     @relation("OpportunityUpdatedBy", fields: [updatedById], references: [id])
+
+  contacts      OpportunityContact[]
+  activities    Activity[]
+
+  @@map("opportunities")
+}
+
+model OpportunityContact {
+  id            String @id @default(cuid())
+  opportunityId String
+  contactId     String
+  role          String?
+  isPrimary     Boolean @default(false)
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  contact     Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([opportunityId, contactId])
+  @@map("opportunity_contacts")
+}
+
+model Lead {
+  id            String   @id @default(cuid())
+  firstName     String?
+  lastName      String
+  company       String
+  title         String?
+  email         String?
+  phone         String?
+  mobilePhone   String?
+  website       String?
+  industry      String?
+  status        String   @default("New")
+  rating        String?
+  leadSource    String?
+  description   String?
+  street        String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String?
+  isConverted   Boolean  @default(false)
+  convertedDate DateTime?
+  convertedAccountId String?
+  convertedContactId String?
+  convertedOpportunityId String?
+
+  ownerId       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customFields  Json?    @db.JsonB
+
+  owner         User     @relation(fields: [ownerId], references: [id])
+  activities    Activity[]
+
+  @@map("leads")
+}
+
+model Case {
+  id            String   @id @default(cuid())
+  caseNumber    String   @unique
+  subject       String
+  description   String?
+  status        String   @default("New")
+  priority      String   @default("Medium")
+  origin        String?
+  type          String?
+  reason        String?
+
+  accountId     String?
+  contactId     String?
+  ownerId       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  closedDate    DateTime?
+
+  customFields  Json?    @db.JsonB
+
+  account       Account? @relation(fields: [accountId], references: [id])
+  contact       Contact? @relation(fields: [contactId], references: [id])
+  owner         User     @relation(fields: [ownerId], references: [id])
+  activities    Activity[]
+
+  @@map("cases")
+}
+
+model Task {
+  id            String   @id @default(cuid())
+  subject       String
+  description   String?
+  status        String   @default("Not Started")
+  priority      String   @default("Normal")
+  dueDate       DateTime?
+  completedDate DateTime?
+
+  whatId        String?
+  whatType      String?
+  whoId         String?
+  whoType       String?
+
+  ownerId       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customFields  Json?    @db.JsonB
+
+  owner         User     @relation(fields: [ownerId], references: [id])
+
+  @@map("tasks")
+}
+
+model Activity {
+  id            String   @id @default(cuid())
+  type          String
+  subject       String
+  description   String?
+  activityDate  DateTime @default(now())
+
+  accountId     String?
+  contactId     String?
+  opportunityId String?
+  leadId        String?
+  caseId        String?
+
+  userId        String
+  createdAt     DateTime @default(now())
+
+  user          User        @relation(fields: [userId], references: [id])
+  account       Account?    @relation(fields: [accountId], references: [id])
+  contact       Contact?    @relation(fields: [contactId], references: [id])
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
+  lead          Lead?       @relation(fields: [leadId], references: [id])
+  case          Case?       @relation(fields: [caseId], references: [id])
+
+  @@map("activities")
+}
+
+// ======================================
+// 動的スキーマエンジン（カスタムオブジェクト）
+// ======================================
+
+model ObjectDefinition {
+  id           String   @id @default(cuid())
+  apiName      String   @unique
+  label        String
+  pluralLabel  String
+  description  String?
+  isCustom     Boolean  @default(true)
+  isActive     Boolean  @default(true)
+  iconName     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  fields       FieldDefinition[]
+  records      CustomRecord[]
+  automationRules AutomationRule[]
+  referencedByFields FieldDefinition[] @relation("FieldReference")
+
+  @@map("object_definitions")
+}
+
+model FieldDefinition {
+  id            String   @id @default(cuid())
+  objectId      String
+  apiName       String
+  label         String
+  dataType      String
+  isRequired    Boolean  @default(false)
+  isUnique      Boolean  @default(false)
+  defaultValue  String?
+  length        Int?
+  precision     Int?
+  scale         Int?
+  picklistValues Json?   @db.JsonB
+  referenceObjectId String?
+  formulaExpression String?
+  description   String?
+  helpText      String?
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  object        ObjectDefinition @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  referenceObject ObjectDefinition? @relation("FieldReference", fields: [referenceObjectId], references: [id])
+
+  @@unique([objectId, apiName])
+  @@map("field_definitions")
+}
+
+model CustomRecord {
+  id            String   @id @default(cuid())
+  objectId      String
+  name          String
+  data          Json     @db.JsonB
+  ownerId       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  object        ObjectDefinition @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  owner         User             @relation(fields: [ownerId], references: [id])
+
+  @@index([objectId])
+  @@map("custom_records")
+}
+
+// ======================================
+// 自動化エンジン
+// ======================================
+
+model AutomationRule {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  objectId      String
+  triggerType   String
+  triggerEvent  String?
+  isActive      Boolean  @default(true)
+  conditions    Json?    @db.JsonB
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  object        ObjectDefinition @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  actions       AutomationAction[]
+  logs          AutomationLog[]
+
+  @@map("automation_rules")
+}
+
+model AutomationAction {
+  id            String   @id @default(cuid())
+  ruleId        String
+  actionType    String
+  actionConfig  Json     @db.JsonB
+  sortOrder     Int      @default(0)
+
+  createdAt     DateTime @default(now())
+
+  rule          AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@map("automation_actions")
+}
+
+model AutomationLog {
+  id            String   @id @default(cuid())
+  ruleId        String
+  recordId      String
+  status        String
+  message       String?
+  executedAt    DateTime @default(now())
+
+  rule          AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@map("automation_logs")
+}
+
+// ======================================
+// レポート・ダッシュボード
+// ======================================
+
+model Report {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  objectApiName String
+  columns       Json     @db.JsonB
+  filters       Json?    @db.JsonB
+  groupBy       Json?    @db.JsonB
+  sortBy        Json?    @db.JsonB
+  chartType     String?
+  chartConfig   Json?    @db.JsonB
+  isPublic      Boolean  @default(false)
+
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  dashboardComponents DashboardComponent[]
+
+  @@map("reports")
+}
+
+model Dashboard {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  isPublic      Boolean  @default(false)
+
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  components    DashboardComponent[]
+
+  @@map("dashboards")
+}
+
+model DashboardComponent {
+  id            String   @id @default(cuid())
+  dashboardId   String
+  reportId      String?
+  componentType String
+  title         String?
+  config        Json?    @db.JsonB
+  positionX     Int      @default(0)
+  positionY     Int      @default(0)
+  width         Int      @default(1)
+  height        Int      @default(1)
+
+  dashboard     Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  report        Report?   @relation(fields: [reportId], references: [id])
+
+  @@map("dashboard_components")
+}
+
+// ======================================
+// ListView（リストビュー）
+// ======================================
+
+model ListView {
+  id            String   @id @default(cuid())
+  name          String
+  objectApiName String
+  columns       Json     @db.JsonB
+  filters       Json?    @db.JsonB
+  sortBy        String?
+  sortOrder     String?  @default("asc")
+  isDefault     Boolean  @default(false)
+  isPublic      Boolean  @default(false)
+
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("list_views")
+}
