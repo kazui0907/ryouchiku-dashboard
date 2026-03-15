@@ -115,44 +115,225 @@ function getMessageBody(message: any): string {
   return '';
 }
 
+// スクリーンショット保存（デバッグ用）
+const SCREENSHOT_DIR = path.join(process.cwd(), 'screenshots');
+
+async function saveScreenshot(page: Page, name: string): Promise<void> {
+  if (!fs.existsSync(SCREENSHOT_DIR)) {
+    fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+  }
+  const filename = `${name}_${Date.now()}.png`;
+  await page.screenshot({ path: path.join(SCREENSHOT_DIR, filename), fullPage: true });
+  console.log(`スクリーンショット保存: ${filename}`);
+}
+
 // マネーフォワードにログイン
 async function login(page: Page): Promise<void> {
   console.log('マネーフォワードにアクセス中...');
 
-  await page.goto('https://biz.moneyforward.com/');
+  // 直接ログインページにアクセス
+  await page.goto('https://id.moneyforward.com/sign_in?client_id=JassaZ_L0a5t7cn8t5-2t3-Q9_v9sEM5NVHtEtqbM9U&nonce=1b0e7a35cca64f28f43f3a37a1d0be57&redirect_uri=https%3A%2F%2Fbiz.moneyforward.com%2Fsso%2Fcallback&response_type=code&scope=openid+email+profile+mfid_user&state=1a9fb5aaa3ce8cabc6ac56e4cbb4f09b');
+
+  // ページ読み込み完了を待機
+  await page.waitForLoadState('networkidle');
+  await saveScreenshot(page, '01_login_page');
+  console.log('ログインページにアクセスしました');
+
+  // メールアドレス入力欄を探す（複数のセレクタを試行）
+  const emailSelectors = [
+    'input[type="email"]',
+    'input[name="mfid_user[email]"]',
+    'input[id*="email"]',
+    'input[placeholder*="メール"]',
+    'input[autocomplete="email"]',
+    '#email',
+  ];
+
+  let emailInput = null;
+  for (const selector of emailSelectors) {
+    try {
+      emailInput = await page.waitForSelector(selector, { timeout: 5000 });
+      if (emailInput) {
+        console.log(`メールアドレス入力欄を発見: ${selector}`);
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  if (!emailInput) {
+    await saveScreenshot(page, '01_error_no_email_input');
+    throw new Error('メールアドレス入力欄が見つかりません');
+  }
+
+  // メールアドレスを入力
+  await emailInput.fill(MF_EMAIL);
+  await saveScreenshot(page, '02_email_entered');
+  console.log('メールアドレスを入力しました');
+
+  // 次へ/ログインボタンを探してクリック
+  const submitSelectors = [
+    'button[type="submit"]',
+    'input[type="submit"]',
+    'button:has-text("次へ")',
+    'button:has-text("ログイン")',
+    'button:has-text("続ける")',
+    '[data-testid*="submit"]',
+  ];
+
+  let submitted = false;
+  for (const selector of submitSelectors) {
+    try {
+      const btn = await page.locator(selector).first();
+      if (await btn.isVisible()) {
+        await btn.click();
+        submitted = true;
+        console.log(`ボタンをクリック: ${selector}`);
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  if (!submitted) {
+    // Enterキーで送信を試行
+    await page.keyboard.press('Enter');
+    console.log('Enterキーで送信を試行');
+  }
+
+  await page.waitForLoadState('networkidle');
+  await saveScreenshot(page, '03_after_email_submit');
+
+  // パスワード入力欄を待機
+  const passwordSelectors = [
+    'input[type="password"]',
+    'input[name="mfid_user[password]"]',
+    'input[id*="password"]',
+    '#password',
+  ];
+
+  let passwordInput = null;
+  for (const selector of passwordSelectors) {
+    try {
+      passwordInput = await page.waitForSelector(selector, { timeout: 10000 });
+      if (passwordInput) {
+        console.log(`パスワード入力欄を発見: ${selector}`);
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  if (!passwordInput) {
+    await saveScreenshot(page, '03_error_no_password_input');
+    throw new Error('パスワード入力欄が見つかりません');
+  }
+
+  // パスワードを入力
+  await passwordInput.fill(MF_PASSWORD);
+  await saveScreenshot(page, '04_password_entered');
+  console.log('パスワードを入力しました');
 
   // ログインボタンをクリック
-  await page.click('text=ログイン');
+  submitted = false;
+  for (const selector of submitSelectors) {
+    try {
+      const btn = await page.locator(selector).first();
+      if (await btn.isVisible()) {
+        await btn.click();
+        submitted = true;
+        console.log(`ログインボタンをクリック: ${selector}`);
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
 
-  // メールアドレス入力
-  await page.waitForSelector('input[type="email"], input[name="mfid_user[email]"]');
-  await page.fill('input[type="email"], input[name="mfid_user[email]"]', MF_EMAIL);
-  await page.click('button[type="submit"], input[type="submit"]');
+  if (!submitted) {
+    await page.keyboard.press('Enter');
+    console.log('Enterキーで送信を試行');
+  }
 
-  // パスワード入力
-  await page.waitForSelector('input[type="password"]');
-  await page.fill('input[type="password"]', MF_PASSWORD);
-  await page.click('button[type="submit"], input[type="submit"]');
+  await page.waitForLoadState('networkidle');
+  await saveScreenshot(page, '05_after_password_submit');
 
   // 認証コード入力画面を待機
   try {
-    await page.waitForSelector('input[name="mfid_user[code]"], input[placeholder*="認証コード"]', { timeout: 10000 });
+    const otpSelectors = [
+      'input[name="mfid_user[code]"]',
+      'input[placeholder*="認証コード"]',
+      'input[placeholder*="確認コード"]',
+      'input[id*="code"]',
+      'input[type="tel"]',
+      'input[inputmode="numeric"]',
+    ];
 
-    console.log('認証コード入力画面を検出');
+    let otpInput = null;
+    for (const selector of otpSelectors) {
+      try {
+        otpInput = await page.waitForSelector(selector, { timeout: 5000 });
+        if (otpInput) {
+          console.log(`認証コード入力欄を発見: ${selector}`);
+          break;
+        }
+      } catch {
+        continue;
+      }
+    }
 
-    // Gmail APIで認証コードを取得
-    const otp = await waitForOTP();
+    if (otpInput) {
+      console.log('認証コード入力画面を検出');
+      await saveScreenshot(page, '06_otp_required');
 
-    // 認証コードを入力
-    await page.fill('input[name="mfid_user[code]"], input[placeholder*="認証コード"]', otp);
-    await page.click('button[type="submit"], input[type="submit"]');
+      // Gmail APIで認証コードを取得
+      const otp = await waitForOTP();
+
+      // 認証コードを入力
+      await otpInput.fill(otp);
+      await saveScreenshot(page, '07_otp_entered');
+      console.log('認証コードを入力しました');
+
+      // 送信
+      for (const selector of submitSelectors) {
+        try {
+          const btn = await page.locator(selector).first();
+          if (await btn.isVisible()) {
+            await btn.click();
+            break;
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      await page.waitForLoadState('networkidle');
+      await saveScreenshot(page, '08_after_otp_submit');
+    }
   } catch (e) {
     // 認証コードが不要な場合はスキップ
     console.log('認証コード入力は不要でした');
   }
 
-  // ログイン完了を確認
-  await page.waitForSelector('[class*="dashboard"], [class*="home"], nav', { timeout: 30000 });
+  // ログイン完了を確認（リダイレクト先のURL or 画面要素で判定）
+  try {
+    await page.waitForURL('**/biz.moneyforward.com/**', { timeout: 30000 });
+    console.log('ログイン完了（URLで確認）');
+  } catch {
+    // URLでの確認が失敗した場合、要素で確認
+    try {
+      await page.waitForSelector('nav, [class*="sidebar"], [class*="menu"]', { timeout: 10000 });
+      console.log('ログイン完了（要素で確認）');
+    } catch {
+      await saveScreenshot(page, '09_login_failed');
+      throw new Error('ログインに失敗しました');
+    }
+  }
+
+  await saveScreenshot(page, '10_login_success');
   console.log('ログイン完了');
 }
 
@@ -226,15 +407,6 @@ async function uploadToAPI(filePath: string, year: number): Promise<void> {
 
   const result = await response.json();
   console.log('アップロード成功:', result.message);
-}
-
-// スクリーンショット保存（デバッグ用）
-async function saveScreenshot(page: Page, name: string): Promise<void> {
-  const screenshotDir = path.join(process.cwd(), 'screenshots');
-  if (!fs.existsSync(screenshotDir)) {
-    fs.mkdirSync(screenshotDir, { recursive: true });
-  }
-  await page.screenshot({ path: path.join(screenshotDir, `${name}_${Date.now()}.png`) });
 }
 
 // メイン処理
