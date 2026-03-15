@@ -347,18 +347,60 @@ async function login(page: Page): Promise<void> {
     console.log('MFA認証コード入力は不要でした');
   }
 
+  // 事業者選択画面のチェック
+  console.log('事業者選択画面をチェック中...');
+  await page.waitForTimeout(2000);
+
+  if (page.url().includes('loginable_office_selection') || page.url().includes('office_selection')) {
+    console.log('事業者選択画面を検出');
+    await saveScreenshot(page, '10_office_selection');
+
+    // 事業者番号 5668-7415 を選択
+    try {
+      // 5668-7415を含む行の選択ボタンをクリック
+      const targetRow = page.locator('tr:has-text("5668-7415"), div:has-text("5668-7415")').first();
+      const selectButton = targetRow.locator('button:has-text("選択する")');
+
+      if (await selectButton.isVisible({ timeout: 5000 })) {
+        await selectButton.click();
+        console.log('事業者（5668-7415）を選択しました');
+      } else {
+        // フォールバック: 最初の選択ボタンをクリック
+        const firstButton = page.locator('button:has-text("選択する")').first();
+        await firstButton.click();
+        console.log('最初の事業者を選択しました');
+      }
+      await page.waitForTimeout(3000);
+      await page.waitForLoadState('networkidle');
+    } catch (e) {
+      console.log('事業者選択ボタンが見つかりません:', e);
+    }
+  }
+
   // ログイン完了を確認
   console.log('ログイン完了を確認中...');
+  console.log('現在のURL:', page.url());
 
   let loginSuccess = false;
 
   // URLで確認（最大30秒待機）
   try {
-    await page.waitForURL('**/biz.moneyforward.com/**', { timeout: 30000 });
+    await page.waitForURL('**/accounting.moneyforward.com/**', { timeout: 30000 });
     console.log('ログイン完了（URLで確認）:', page.url());
     loginSuccess = true;
   } catch {
-    console.log('biz.moneyforward.com へのリダイレクトがタイムアウト');
+    console.log('accounting.moneyforward.com へのリダイレクトを待機中...');
+  }
+
+  if (!loginSuccess) {
+    // biz.moneyforward.comでも確認
+    try {
+      await page.waitForURL('**/biz.moneyforward.com/**', { timeout: 10000 });
+      console.log('ログイン完了（biz URLで確認）:', page.url());
+      loginSuccess = true;
+    } catch {
+      console.log('biz.moneyforward.com へのリダイレクトもタイムアウト');
+    }
   }
 
   if (!loginSuccess) {
