@@ -43,46 +43,69 @@ async function waitForOTP(maxWaitMs = 120000): Promise<string> {
 
   console.log('認証コードメールを待機中...');
 
-  while (Date.now() - startTime < maxWaitMs) {
-    try {
-      // 直近5分以内のマネーフォワードからのメールを検索
-      const res = await gmail.users.messages.list({
-        userId: 'me',
-        q: 'from:noreply@moneyforward.com subject:認証コード newer_than:5m',
-        maxResults: 1,
-      });
+  // 複数の検索クエリを試行（マネーフォワードのメール形式に対応）
+  const searchQueries = [
+    'from:moneyforward.com newer_than:5m is:unread',
+    'from:moneyforward subject:確認コード newer_than:5m',
+    'from:moneyforward subject:認証コード newer_than:5m',
+    'from:moneyforward subject:ワンタイムパスワード newer_than:5m',
+    'from:noreply@moneyforward.com newer_than:5m',
+    'from:no-reply@moneyforward.com newer_than:5m',
+    'subject:マネーフォワード 認証 newer_than:5m',
+  ];
 
-      if (res.data.messages && res.data.messages.length > 0) {
-        const messageId = res.data.messages[0].id!;
-        const message = await gmail.users.messages.get({
+  while (Date.now() - startTime < maxWaitMs) {
+    for (const query of searchQueries) {
+      try {
+        console.log(`検索中: ${query}`);
+        const res = await gmail.users.messages.list({
           userId: 'me',
-          id: messageId,
-          format: 'full',
+          q: query,
+          maxResults: 5,
         });
 
-        // メール本文から6桁の認証コードを抽出
-        const body = getMessageBody(message.data);
-        const otpMatch = body.match(/\b(\d{6})\b/);
+        if (res.data.messages && res.data.messages.length > 0) {
+          console.log(`${res.data.messages.length}件のメールが見つかりました`);
 
-        if (otpMatch) {
-          console.log('認証コードを取得しました');
+          for (const msg of res.data.messages) {
+            const message = await gmail.users.messages.get({
+              userId: 'me',
+              id: msg.id!,
+              format: 'full',
+            });
 
-          // 使用済みメールを既読にする（重複防止）
-          await gmail.users.messages.modify({
-            userId: 'me',
-            id: messageId,
-            requestBody: {
-              removeLabelIds: ['UNREAD'],
-            },
-          });
+            // 件名を表示（デバッグ用）
+            const headers = message.data.payload?.headers || [];
+            const subject = headers.find(h => h.name === 'Subject')?.value || '(件名なし)';
+            const from = headers.find(h => h.name === 'From')?.value || '(送信者不明)';
+            console.log(`メール: From=${from}, Subject=${subject}`);
 
-          return otpMatch[1];
+            // メール本文から6桁の認証コードを抽出
+            const body = getMessageBody(message.data);
+            const otpMatch = body.match(/\b(\d{6})\b/);
+
+            if (otpMatch) {
+              console.log('認証コードを取得しました:', otpMatch[1]);
+
+              // 使用済みメールを既読にする（重複防止）
+              await gmail.users.messages.modify({
+                userId: 'me',
+                id: msg.id!,
+                requestBody: {
+                  removeLabelIds: ['UNREAD'],
+                },
+              });
+
+              return otpMatch[1];
+            }
+          }
         }
+      } catch (error) {
+        console.error(`Gmail API エラー (${query}):`, error);
       }
-    } catch (error) {
-      console.error('Gmail API エラー:', error);
     }
 
+    console.log(`メールが見つかりません。${checkInterval / 1000}秒後に再試行...`);
     await new Promise(resolve => setTimeout(resolve, checkInterval));
   }
 
