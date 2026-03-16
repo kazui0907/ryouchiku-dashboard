@@ -1,1 +1,0 @@
-/Users/kazui/scripts/ai-employee/k.ryochiku/scripts/auto-mail-check.sh: line 22: 23262 Terminated: 15          claude --print "メール自動処理を実行してください。Google Driveの指示ファイルを確認し、承認済みメールの送信、修正指示への対応、新着メールの処理を行ってください。" >> "$LOG_FILE" 2>&1
