@@ -12,9 +12,17 @@
 /* ************************************************************************** */
 @import "tailwindcss";
 
+/*
+ * ダークモード自動切替は無効化（2026-04-25）
+ * 理由: 本ダッシュボードは bg-white / bg-gray-50 など固定色を多用しており、
+ *       OSのダークモードだけ body 文字色が #ededed になると
+ *       明示色指定がないセルが「ほぼ白の文字」として読めなくなる事故が発生。
+ * 方針: 常にライトテーマ固定、本文色は #111827 (gray-900) に固定。
+ */
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827; /* gray-900: カード/テーブル上でも読める濃色固定 */
 }
 
 @theme inline {
@@ -24,15 +32,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* OSダークモードでも強制ライト表示 */
+  color-scheme: light;
 }
