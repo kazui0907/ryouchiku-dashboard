@@ -169,25 +169,38 @@ async function main() {
       const clean = await prisma.weeklySiteKPI.findUnique({
         where: { year_month_mainItem_subItem: cleanWhere },
       });
-      const cleanIsEmpty = !clean || [1, 2, 3, 4, 5].every((w) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const c: any = clean;
-        return c?.[`week${w}Target`] == null && c?.[`week${w}Actual`] == null;
-      });
 
-      if (!cleanIsEmpty) {
-        console.log(`  ⚠️  ${mainItem}::${candidate} [${r.year}/${r.month}月] 正規側に既に値があるため救済をスキップ`);
-        continue;
-      }
-
-      // 値をコピー
+      // フィールド粒度でマージ: 正規側が null の項目だけ、ゴミ側の値で埋める。
+      // 正規側に既に値がある項目は上書きしない（データ破壊を防ぐ）。
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const src: any = r;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const c: any = clean ?? {};
       const data: Record<string, number | null> = {};
+      const copied: string[] = [];
+      const kept: string[] = [];
       for (let w = 1; w <= 5; w++) {
-        data[`week${w}Target`] = src[`week${w}Target`] ?? null;
-        data[`week${w}Actual`] = src[`week${w}Actual`] ?? null;
-        data[`week${w}Rate`] = src[`week${w}Rate`] ?? null;
+        for (const f of ['Target', 'Actual', 'Rate']) {
+          const field = `week${w}${f}`;
+          const cleanVal = c[field];
+          const dirtyVal = src[field];
+          if (cleanVal != null) {
+            data[field] = cleanVal; // 正規側の値を保持
+            if (dirtyVal != null && dirtyVal !== cleanVal) {
+              kept.push(`${field}=${cleanVal}(ゴミ側${dirtyVal}を捨てる)`);
+            }
+          } else if (dirtyVal != null) {
+            data[field] = dirtyVal;
+            copied.push(`${field}=${dirtyVal}`);
+          } else {
+            data[field] = null;
+          }
+        }
+      }
+
+      if (copied.length === 0 && kept.length === 0) {
+        // 正規側もゴミ側も全 null 相当。何もしない。
+        continue;
       }
 
       if (clean) {
@@ -200,8 +213,13 @@ async function main() {
           data: { year: r.year, month: r.month, mainItem, subItem: candidate, ...data },
         });
       }
-      salvagedCount++;
-      console.log(`  ✅ ${mainItem}::${subItem.replace(/\n/g, '\\n')} [${r.year}/${r.month}月] → ${mainItem}::${candidate} に値をコピー`);
+      if (copied.length > 0) {
+        salvagedCount++;
+        console.log(`  ✅ ${mainItem}::${subItem.replace(/\n/g, '\\n')} [${r.year}/${r.month}月] → ${mainItem}::${candidate}: 救済 ${copied.length} フィールド [${copied.join(', ')}]`);
+      }
+      if (kept.length > 0) {
+        console.log(`     ℹ️  既存値を優先してゴミ値を捨てた: ${kept.join(', ')}`);
+      }
     }
   }
 
