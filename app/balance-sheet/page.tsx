@@ -73,7 +73,7 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-sm min-w-36">
-      <p className="font-semibold text-gray-700 mb-2">{label}</p>
+      <p className="font-semibold text-gray-900 mb-2">{label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex justify-between gap-4">
           <span style={{ color: p.fill }} className="font-medium">{p.name}</span>
@@ -259,10 +259,10 @@ export default function BalanceSheetPage() {
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900">月</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-blue-600">流動資産</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-purple-600">固定資産</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">総資産</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-900">総資産</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-orange-500">流動負債</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-yellow-600">固定負債</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">負債合計</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-900">負債合計</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-emerald-600">純資産</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-gray-900">自己資本比率</th>
                       </tr>
@@ -274,7 +274,7 @@ export default function BalanceSheetPage() {
                           ? ((r.netAssets ?? 0) / r.totalAssets * 100).toFixed(1) + '%'
                           : '—';
                         return (
-                          <tr key={r.month} className={empty ? 'text-gray-300' : 'hover:bg-gray-50'}>
+                          <tr key={r.month} className={empty ? 'text-gray-300' : 'hover:bg-gray-50 text-gray-900'}>
                             <td className="px-4 py-3 font-medium">{r.month}</td>
                             <td className="px-4 py-3 text-right tabular-nums">{empty ? '—' : formatCurrency(r.currentAssets!)}</td>
                             <td className="px-4 py-3 text-right tabular-nums">{empty ? '—' : formatCurrency(r.fixedAssets!)}</td>

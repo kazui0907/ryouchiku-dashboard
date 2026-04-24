@@ -39,7 +39,7 @@ export default function SyncPage() {
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-gray-900 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             戻る
@@ -127,7 +127,7 @@ export default function SyncPage() {
               {/* 設定情報 */}
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-2">接続設定</h3>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-gray-900 space-y-1">
                   <div>スプレッドシートID: 1nHRns9I_Vj_7JRVWq45CZwhFQrCfzpSqMJv8IzZrSq0</div>
                   <div>シート名: mf資料</div>
                 </div>

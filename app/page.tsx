@@ -221,7 +221,7 @@ export default function Dashboard() {
             {/* 月選択 */}
             <div className="flex items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
-                <label htmlFor="year-select" className="text-sm font-medium text-gray-700">
+                <label htmlFor="year-select" className="text-sm font-medium text-gray-900">
                   年:
                 </label>
                 <select
@@ -238,7 +238,7 @@ export default function Dashboard() {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <label htmlFor="month-select" className="text-sm font-medium text-gray-700">
+                <label htmlFor="month-select" className="text-sm font-medium text-gray-900">
                   月:
                 </label>
                 <select
@@ -284,7 +284,7 @@ export default function Dashboard() {
         {/* 期間選択 */}
         {hasAccountingData && (
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 bg-white border border-gray-200 rounded-lg px-4 py-3">
-            <span className="text-sm font-medium text-gray-700">累計期間:</span>
+            <span className="text-sm font-medium text-gray-900">累計期間:</span>
             <select
               value={fromMonth}
               onChange={(e) => {
@@ -329,7 +329,7 @@ export default function Dashboard() {
           {/* 売上高 */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">売上高</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">売上高</CardTitle>
               <DollarSign className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
@@ -409,7 +409,7 @@ export default function Dashboard() {
           {/* 限界利益 */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">限界利益</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">限界利益</CardTitle>
               <Target className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
@@ -419,7 +419,7 @@ export default function Dashboard() {
                   <div className="text-lg font-bold">
                     {formatCurrency(currentMonth.marginProfit || 0)}
                   </div>
-                  <div className="text-xs text-gray-600 mt-1">
+                  <div className="text-xs text-gray-900 mt-1">
                     率: {formatPercent(currentMonth.marginProfitRate || 0)}
                   </div>
                   {currentMonth.budgetMarginProfit && currentMonth.marginProfit !== null && (
@@ -492,7 +492,7 @@ export default function Dashboard() {
           {/* 売上総利益 */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">売上総利益</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">売上総利益</CardTitle>
               <Target className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
@@ -502,7 +502,7 @@ export default function Dashboard() {
                   <div className="text-lg font-bold">
                     {formatCurrency(currentMonth.grossProfit)}
                   </div>
-                  <div className="text-xs text-gray-600 mt-1">
+                  <div className="text-xs text-gray-900 mt-1">
                     率: {formatPercent(currentMonth.grossProfitRate)}
                   </div>
                   {currentMonth.budgetGrossProfit && (
@@ -575,7 +575,7 @@ export default function Dashboard() {
           {/* 営業利益 */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">営業利益</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">営業利益</CardTitle>
               <Users className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
@@ -588,7 +588,7 @@ export default function Dashboard() {
                       : '—'}
                   </div>
                   {currentMonth.operatingProfit !== null && currentMonth.salesRevenue > 0 && (
-                    <div className="text-xs text-gray-600 mt-1">
+                    <div className="text-xs text-gray-900 mt-1">
                       率: {formatPercent(currentMonth.operatingProfit / currentMonth.salesRevenue)}
                     </div>
                   )}
@@ -679,7 +679,7 @@ export default function Dashboard() {
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-300">
-                      <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-700 border-r-2 border-gray-300 min-w-[180px]">
+                      <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-300 min-w-[180px]">
                         項目
                       </th>
                       {[1, 2, 3, 4, 5].map((week) => {
@@ -729,14 +729,14 @@ export default function Dashboard() {
                         return (
                           <th
                             key={week}
-                            className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]"
+                            className="px-4 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[120px]"
                           >
                             <div>第{week}週</div>
                             {dateRange && <div className="text-xs font-normal text-gray-900">{dateRange}</div>}
                           </th>
                         );
                       })}
-                      <th className="px-4 py-3 text-center font-semibold text-gray-700 border-l-2 border-gray-300 min-w-[120px]">
+                      <th className="px-4 py-3 text-center font-semibold text-gray-900 border-l-2 border-gray-300 min-w-[120px]">
                         累計
                       </th>
                     </tr>
@@ -809,7 +809,7 @@ export default function Dashboard() {
                               </div>
                               {/* 目標数 */}
                               {item.total.target !== null && (
-                                <div className="text-xs text-gray-600">
+                                <div className="text-xs text-gray-900">
                                   {formatValue(item.total.target)}
                                 </div>
                               )}
@@ -876,7 +876,7 @@ export default function Dashboard() {
                   <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr className="border-b-2 border-gray-300">
-                        <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-700 border-r-2 border-gray-300 min-w-[220px]">
+                        <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-300 min-w-[220px]">
                           項目
                         </th>
                         {[1, 2, 3, 4, 5].map((week) => {
@@ -895,13 +895,13 @@ export default function Dashboard() {
                           };
                           const dateRange = getWeekRange(selectedYear, selectedMonth, week);
                           return (
-                            <th key={week} className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]">
+                            <th key={week} className="px-4 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[120px]">
                               <div>第{week}週</div>
                               {dateRange && <div className="text-xs font-normal text-gray-900">{dateRange}</div>}
                             </th>
                           );
                         })}
-                        <th className="px-4 py-3 text-center font-semibold text-gray-700 border-l-2 border-gray-300 min-w-[120px]">
+                        <th className="px-4 py-3 text-center font-semibold text-gray-900 border-l-2 border-gray-300 min-w-[120px]">
                           累計
                         </th>
                       </tr>
@@ -918,7 +918,7 @@ export default function Dashboard() {
                           {/* サブ項目行 */}
                           {group.items.map((item: any, idx: number) => (
                             <tr key={`${group.mainItem}-${idx}`} className="border-b border-gray-200 hover:bg-gray-50">
-                              <td className="sticky left-0 bg-white z-10 px-4 py-3 text-gray-700 border-r-2 border-gray-300 pl-8">
+                              <td className="sticky left-0 bg-white z-10 px-4 py-3 text-gray-900 border-r-2 border-gray-300 pl-8">
                                 {item.subName || item.name}
                               </td>
                               {[1, 2, 3, 4, 5].map((weekNum) => {
@@ -956,7 +956,7 @@ export default function Dashboard() {
                                     {formatSiteValue(item.total.actual, item.subName, item.name)}
                                   </div>
                                   {item.total.target !== null && (
-                                    <div className="text-xs text-gray-600">
+                                    <div className="text-xs text-gray-900">
                                       {formatSiteValue(item.total.target, item.subName, item.name)}
                                     </div>
                                   )}

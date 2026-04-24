@@ -25,7 +25,7 @@ function renderMarkdown(text: string) {
     } else if (line.match(/^[・\-\*] /)) {
       const content = line.replace(/^[・\-\*] /, '');
       elements.push(
-        <li key={key++} className="ml-4 text-sm text-gray-700 leading-relaxed list-disc">
+        <li key={key++} className="ml-4 text-sm text-gray-900 leading-relaxed list-disc">
           {renderInline(content)}
         </li>
       );
@@ -33,7 +33,7 @@ function renderMarkdown(text: string) {
       const content = line.replace(/^\d+\. /, '');
       const num = line.match(/^(\d+)\./)?.[1];
       elements.push(
-        <div key={key++} className="flex gap-2 ml-2 text-sm text-gray-700 leading-relaxed">
+        <div key={key++} className="flex gap-2 ml-2 text-sm text-gray-900 leading-relaxed">
           <span className="font-bold text-blue-600 shrink-0">{num}.</span>
           <span>{renderInline(content)}</span>
         </div>
@@ -42,7 +42,7 @@ function renderMarkdown(text: string) {
       elements.push(<div key={key++} className="h-1" />);
     } else {
       elements.push(
-        <p key={key++} className="text-sm text-gray-700 leading-relaxed">
+        <p key={key++} className="text-sm text-gray-900 leading-relaxed">
           {renderInline(line)}
         </p>
       );
@@ -134,8 +134,8 @@ export function AIKpiAnalysis({ year, month }: Props) {
               onClick={() => setShowEditor(v => !v)}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-colors ${
                 showEditor
-                  ? 'bg-gray-100 border-gray-300 text-gray-700'
-                  : 'border-gray-200 text-gray-900 hover:bg-gray-50 hover:text-gray-700'
+                  ? 'bg-gray-100 border-gray-300 text-gray-900'
+                  : 'border-gray-200 text-gray-900 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
               <Settings className="h-4 w-4" />
@@ -161,30 +161,30 @@ export function AIKpiAnalysis({ year, month }: Props) {
         {showEditor && (
           <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                 <Settings className="h-4 w-4" />
                 分析指示文の編集
               </h3>
-              <button onClick={() => setShowEditor(false)} className="text-gray-900 hover:text-gray-600">
+              <button onClick={() => setShowEditor(false)} className="text-gray-900 hover:text-gray-900">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* 現在のプロンプト */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium text-gray-900 mb-1">
                 現在の分析指示文（直接編集できます）
               </label>
               <textarea
                 value={promptInstructions}
                 onChange={e => setPromptInstructions(e.target.value)}
                 rows={10}
-                className="w-full text-xs font-mono text-gray-700 bg-white border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-y"
+                className="w-full text-xs font-mono text-gray-900 bg-white border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-y"
               />
               {isCustomPrompt && (
                 <button
                   onClick={() => setPromptInstructions(DEFAULT_PROMPT_INSTRUCTIONS)}
-                  className="mt-1 text-xs text-gray-900 hover:text-gray-600 underline"
+                  className="mt-1 text-xs text-gray-900 hover:text-gray-900 underline"
                 >
                   デフォルトに戻す
                 </button>
@@ -193,7 +193,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
 
             {/* AI修正依頼 */}
             <div className="border-t border-gray-200 pt-4">
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium text-gray-900 mb-1">
                 AIに修正を依頼する（変更したい内容を日本語で書いてください）
               </label>
               <textarea
@@ -201,7 +201,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
                 onChange={e => setEditRequest(e.target.value)}
                 placeholder="例：受注件数と受注率をより重視してほしい。また、改善すべき点は2項目に絞ってほしい。"
                 rows={3}
-                className="w-full text-sm text-gray-700 bg-white border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+                className="w-full text-sm text-gray-900 bg-white border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
               />
               {editError && (
                 <p className="text-xs text-red-500 mt-1">{editError}</p>

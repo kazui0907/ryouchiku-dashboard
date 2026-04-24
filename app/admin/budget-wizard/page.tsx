@@ -323,7 +323,7 @@ export default function BudgetWizardPage() {
             <div className="flex items-center">
               <button
                 onClick={() => (step === 1 ? router.back() : setStep((s) => (s - 1) as any))}
-                className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+                className="flex items-center text-gray-900 hover:text-gray-900 mr-4"
               >
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 {step === 1 ? '戻る' : '前へ'}
@@ -376,7 +376,7 @@ export default function BudgetWizardPage() {
                 年間の目標数字を入力して「計算」を押すと、過去3カ年の月次比率をもとに月別予算が自動計算されます。
               </p>
               <div className="flex items-center gap-3 mb-6">
-                <label className="text-sm font-medium text-gray-700">対象年度</label>
+                <label className="text-sm font-medium text-gray-900">対象年度</label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
@@ -395,7 +395,7 @@ export default function BudgetWizardPage() {
                   { label: '営業利益目標', key: 'operatingProfit' as const },
                 ].map(({ label, key }) => (
                   <div key={key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+                    <label className="block text-sm font-medium text-gray-900 mb-1">{label}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -442,11 +442,11 @@ export default function BudgetWizardPage() {
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-300 bg-gray-50">
-                      <th className="px-3 py-2 text-left font-semibold text-gray-700 w-16">月</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">売上</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">売上総利益</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">限界利益</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">営業利益</th>
+                      <th className="px-3 py-2 text-left font-semibold text-gray-900 w-16">月</th>
+                      <th className="px-3 py-2 text-right font-semibold text-gray-900">売上</th>
+                      <th className="px-3 py-2 text-right font-semibold text-gray-900">売上総利益</th>
+                      <th className="px-3 py-2 text-right font-semibold text-gray-900">限界利益</th>
+                      <th className="px-3 py-2 text-right font-semibold text-gray-900">営業利益</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -517,15 +517,15 @@ export default function BudgetWizardPage() {
                 <table className="w-full border-collapse text-xs">
                   <thead>
                     <tr className="border-b-2 border-gray-300 bg-gray-50">
-                      <th className="sticky left-0 bg-gray-50 z-10 px-3 py-2 text-left font-semibold text-gray-700 min-w-[220px] border-r border-gray-300">
+                      <th className="sticky left-0 bg-gray-50 z-10 px-3 py-2 text-left font-semibold text-gray-900 min-w-[220px] border-r border-gray-300">
                         項目
                       </th>
                       {MONTHS.map((m) => (
-                        <th key={m} className="px-2 py-2 text-center font-semibold text-gray-700 min-w-[80px]">
+                        <th key={m} className="px-2 py-2 text-center font-semibold text-gray-900 min-w-[80px]">
                           {m}月
                         </th>
                       ))}
-                      <th className="px-2 py-2 text-center font-semibold text-gray-700 min-w-[90px] bg-gray-100">年間合計</th>
+                      <th className="px-2 py-2 text-center font-semibold text-gray-900 min-w-[90px] bg-gray-100">年間合計</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -551,8 +551,8 @@ export default function BudgetWizardPage() {
                               isDerived || isSales
                                 ? 'bg-blue-50 font-bold text-blue-900'
                                 : SUBTOTAL_LABELS.includes(li.category)
-                                ? 'bg-gray-100 font-semibold text-gray-700'
-                                : 'bg-white text-gray-700'
+                                ? 'bg-gray-100 font-semibold text-gray-900'
+                                : 'bg-white text-gray-900'
                             }`}
                           >
                             <div>{li.category}</div>
@@ -567,7 +567,7 @@ export default function BudgetWizardPage() {
                                       ? 'text-red-600'
                                       : isDerived
                                       ? 'text-blue-800'
-                                      : 'text-gray-600'
+                                      : 'text-gray-900'
                                   }`}
                                 >
                                   {li.category === '限界利益率'
@@ -587,7 +587,7 @@ export default function BudgetWizardPage() {
                           ))}
                           <td
                             className={`px-2 py-2 text-right font-semibold ${
-                              isDerived && rowTotal < 0 ? 'text-red-600' : isDerived ? 'text-blue-800' : 'text-gray-600'
+                              isDerived && rowTotal < 0 ? 'text-red-600' : isDerived ? 'text-blue-800' : 'text-gray-900'
                             } bg-gray-50`}
                           >
                             {li.category === '限界利益率'
@@ -627,11 +627,11 @@ export default function BudgetWizardPage() {
                   <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr className="border-b-2 border-gray-300 bg-gray-50">
-                        <th className="px-3 py-2 text-left font-semibold text-gray-700">月</th>
-                        <th className="px-3 py-2 text-right font-semibold text-gray-700">売上</th>
-                        <th className="px-3 py-2 text-right font-semibold text-gray-700">売上総利益</th>
-                        <th className="px-3 py-2 text-right font-semibold text-gray-700">限界利益</th>
-                        <th className="px-3 py-2 text-right font-semibold text-gray-700">営業利益</th>
+                        <th className="px-3 py-2 text-left font-semibold text-gray-900">月</th>
+                        <th className="px-3 py-2 text-right font-semibold text-gray-900">売上</th>
+                        <th className="px-3 py-2 text-right font-semibold text-gray-900">売上総利益</th>
+                        <th className="px-3 py-2 text-right font-semibold text-gray-900">限界利益</th>
+                        <th className="px-3 py-2 text-right font-semibold text-gray-900">営業利益</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -669,8 +669,8 @@ export default function BudgetWizardPage() {
                   <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr className="border-b-2 border-gray-300 bg-gray-50">
-                        <th className="px-3 py-2 text-left font-semibold text-gray-700 min-w-[200px]">項目</th>
-                        <th className="px-3 py-2 text-right font-semibold text-gray-700">年間予算合計</th>
+                        <th className="px-3 py-2 text-left font-semibold text-gray-900 min-w-[200px]">項目</th>
+                        <th className="px-3 py-2 text-right font-semibold text-gray-900">年間予算合計</th>
                       </tr>
                     </thead>
                     <tbody>

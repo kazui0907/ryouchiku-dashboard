@@ -61,7 +61,7 @@ function MFUploadCard({
 
       {/* 年度選択 */}
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-sm font-medium text-gray-700 whitespace-nowrap">データの年度:</label>
+        <label className="text-sm font-medium text-gray-900 whitespace-nowrap">データの年度:</label>
         <select
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
@@ -91,7 +91,7 @@ function MFUploadCard({
           />
         </label>
         {file && (
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-900">
             選択中: <span className="font-medium">{file.name}</span>
           </p>
         )}

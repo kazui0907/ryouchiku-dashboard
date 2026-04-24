@@ -160,7 +160,7 @@ export default function AccountingPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h1 className="text-xl sm:text-3xl font-bold text-gray-900">月次会計一覧（全項目）</h1>
               <div className="flex items-center gap-4">
-                <label className="text-sm font-medium text-gray-700">年度:</label>
+                <label className="text-sm font-medium text-gray-900">年度:</label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
@@ -183,13 +183,13 @@ export default function AccountingPage() {
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-300">
-                      <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-700 border-r-2 border-gray-300 min-w-[200px]">
+                      <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-300 min-w-[200px]">
                         項目
                       </th>
                       {Array.from({ length: 12 }, (_, i) => (
                         <th
                           key={i + 1}
-                          className="px-2 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[140px]"
+                          className="px-2 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[140px]"
                         >
                           {i + 1}月
                         </th>
@@ -253,7 +253,7 @@ export default function AccountingPage() {
 
                                       {/* 昨年対比 */}
                                       {lastYear !== null && lastYear !== 0 && value !== null && (
-                                        <div className="text-xs text-gray-600">
+                                        <div className="text-xs text-gray-900">
                                           YoY: {calculateYoYRate(value, lastYear)}
                                         </div>
                                       )}
@@ -274,13 +274,13 @@ export default function AccountingPage() {
 
           {/* 凡例 */}
           <div className="mt-6 p-4 bg-white rounded-lg border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">凡例</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">凡例</h3>
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <div className="font-semibold mb-1">達成率（収益・利益項目）:</div>
-                  <div className="text-xs text-gray-600 mb-1">対象: 売上高、売上高合計、法人、一般顧客、限界利益、限界利益率、売上総利益、売上総利益率、営業利益、営業利益率</div>
-                  <div className="text-xs text-gray-600 mb-1">→ 実績が多いほど良い</div>
+                  <div className="text-xs text-gray-900 mb-1">対象: 売上高、売上高合計、法人、一般顧客、限界利益、限界利益率、売上総利益、売上総利益率、営業利益、営業利益率</div>
+                  <div className="text-xs text-gray-900 mb-1">→ 実績が多いほど良い</div>
                   <div className="ml-2">
                     <div><span className="text-green-600 font-bold">■ 緑:</span> 予算達成（100%以上）</div>
                     <div><span className="text-yellow-600 font-bold">■ 黄:</span> 80-100%未満</div>
@@ -289,8 +289,8 @@ export default function AccountingPage() {
                 </div>
                 <div>
                   <div className="font-semibold mb-1">達成率（コスト項目）:</div>
-                  <div className="text-xs text-gray-600 mb-1">対象: 売上原価、販売費及び一般管理費、販売費及び一般管理費合計、販管費率など（上記以外）</div>
-                  <div className="text-xs text-gray-600 mb-1">→ 実績が少ないほど良い</div>
+                  <div className="text-xs text-gray-900 mb-1">対象: 売上原価、販売費及び一般管理費、販売費及び一般管理費合計、販管費率など（上記以外）</div>
+                  <div className="text-xs text-gray-900 mb-1">→ 実績が少ないほど良い</div>
                   <div className="ml-2">
                     <div><span className="text-green-600 font-bold">■ 緑:</span> 予算の80%以下</div>
                     <div><span className="text-yellow-600 font-bold">■ 黄:</span> 80-100%</div>
@@ -298,7 +298,7 @@ export default function AccountingPage() {
                   </div>
                 </div>
               </div>
-              <div className="border-t pt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-600">
+              <div className="border-t pt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-900">
                 <div>
                   <span className="font-semibold">YoY:</span> 昨年対比（前年同月比）
                 </div>

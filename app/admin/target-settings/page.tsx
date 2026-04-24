@@ -293,7 +293,7 @@ export default function TargetSettingsPage() {
     `px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
       activeTab === tab
         ? 'border-blue-500 text-blue-600'
-        : 'border-transparent text-gray-900 hover:text-gray-700'
+        : 'border-transparent text-gray-900 hover:text-gray-900'
     }`;
 
   return (
@@ -303,7 +303,7 @@ export default function TargetSettingsPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center">
-              <button onClick={() => router.back()} className="flex items-center text-gray-600 hover:text-gray-900 mr-4">
+              <button onClick={() => router.back()} className="flex items-center text-gray-900 hover:text-gray-900 mr-4">
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 戻る
               </button>
@@ -359,9 +359,9 @@ export default function TargetSettingsPage() {
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-300 bg-gray-50">
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700 min-w-[60px]">月</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-900 min-w-[60px]">月</th>
                       {BUDGET_LABELS.map((b) => (
-                        <th key={b.key} className="px-4 py-3 text-center font-semibold text-gray-700 min-w-[160px]">{b.label}</th>
+                        <th key={b.key} className="px-4 py-3 text-center font-semibold text-gray-900 min-w-[160px]">{b.label}</th>
                       ))}
                     </tr>
                   </thead>
@@ -413,7 +413,7 @@ export default function TargetSettingsPage() {
                   {selectedMonth > 1 && (
                     <button
                       onClick={copyFromPrevMonth}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-900 hover:bg-gray-50"
                     >
                       前月からコピー
                     </button>
@@ -426,11 +426,11 @@ export default function TargetSettingsPage() {
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-300 bg-gray-50">
-                      <th className="sticky left-0 bg-gray-50 z-10 px-4 py-3 text-left font-semibold text-gray-700 border-r-2 border-gray-300 min-w-[180px]">項目</th>
+                      <th className="sticky left-0 bg-gray-50 z-10 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-300 min-w-[180px]">項目</th>
                       {[1, 2, 3, 4, 5].map((w) => {
                         const range = getWeekRange(w);
                         return (
-                          <th key={w} className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]">
+                          <th key={w} className="px-4 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[120px]">
                             <div>第{w}週</div>
                             {range && <div className="text-xs font-normal text-gray-900">{range}</div>}
                           </th>
@@ -499,7 +499,7 @@ export default function TargetSettingsPage() {
                   {selectedMonth > 1 && (
                     <button
                       onClick={copyFromPrevMonthSite}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-900 hover:bg-gray-50"
                     >
                       前月からコピー
                     </button>
@@ -512,11 +512,11 @@ export default function TargetSettingsPage() {
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-300 bg-gray-50">
-                      <th className="sticky left-0 bg-gray-50 z-10 px-4 py-3 text-left font-semibold text-gray-700 border-r-2 border-gray-300 min-w-[220px]">項目</th>
+                      <th className="sticky left-0 bg-gray-50 z-10 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-300 min-w-[220px]">項目</th>
                       {[1, 2, 3, 4, 5].map((w) => {
                         const range = getWeekRange(w);
                         return (
-                          <th key={w} className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]">
+                          <th key={w} className="px-4 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[120px]">
                             <div>第{w}週</div>
                             {range && <div className="text-xs font-normal text-gray-900">{range}</div>}
                           </th>
@@ -536,7 +536,7 @@ export default function TargetSettingsPage() {
                           const key = `${mainItem}::${subItem}`;
                           return (
                             <tr key={key} className="border-b border-gray-200 hover:bg-gray-50">
-                              <td className="sticky left-0 bg-white z-10 px-4 py-3 text-gray-700 border-r-2 border-gray-300 pl-8">{subItem}</td>
+                              <td className="sticky left-0 bg-white z-10 px-4 py-3 text-gray-900 border-r-2 border-gray-300 pl-8">{subItem}</td>
                               {[1, 2, 3, 4, 5].map((w) => {
                                 const range = getWeekRange(w);
                                 return (

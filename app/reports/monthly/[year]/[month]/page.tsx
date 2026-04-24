@@ -71,7 +71,7 @@ export default function MonthlyReportPage() {
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-gray-900 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             戻る
@@ -125,10 +125,10 @@ export default function MonthlyReportPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold">
                       {formatCurrency(data.salesRevenue)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {data.budgetSales ? formatCurrency(data.budgetSales) : '—'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {data.lastYearSalesRevenue ? formatCurrency(data.lastYearSalesRevenue) : '—'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
@@ -155,18 +155,18 @@ export default function MonthlyReportPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-600">
                       {formatCurrency(data.costOfSales)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {data.lastYearCostOfSales ? formatCurrency(data.lastYearCostOfSales) : '—'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                       {data.lastYearCostOfSales ? (
-                        <span className="text-gray-600">
+                        <span className="text-gray-900">
                           {formatPercent(data.costOfSales / data.lastYearCostOfSales)}
                         </span>
                       ) : '—'}
@@ -181,10 +181,10 @@ export default function MonthlyReportPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-orange-600">
                       {data.marginProfit ? formatCurrency(data.marginProfit) : '—'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {data.budgetMarginProfit ? formatCurrency(data.budgetMarginProfit) : '—'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {data.lastYearMarginProfit ? formatCurrency(data.lastYearMarginProfit) : '—'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
@@ -211,16 +211,16 @@ export default function MonthlyReportPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
                       {data.marginProfitRate ? formatPercent(data.marginProfitRate) : '—'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
                   </tr>
@@ -233,13 +233,13 @@ export default function MonthlyReportPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-green-600">
                       {formatCurrency(data.grossProfit)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {data.lastYearGrossProfit ? formatCurrency(data.lastYearGrossProfit) : '—'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
@@ -259,16 +259,16 @@ export default function MonthlyReportPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
                       {formatPercent(data.grossProfitRate)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       —
                     </td>
                   </tr>
@@ -283,13 +283,13 @@ export default function MonthlyReportPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-purple-600">
                           {formatCurrency(data.operatingProfit)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           —
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           {data.lastYearOperatingProfit ? formatCurrency(data.lastYearOperatingProfit) : '—'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           —
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
@@ -309,16 +309,16 @@ export default function MonthlyReportPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
                           {formatPercent(data.operatingProfit / data.salesRevenue)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           —
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           —
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           —
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                           —
                         </td>
                       </tr>
@@ -334,7 +334,7 @@ export default function MonthlyReportPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">売上達成率</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">売上達成率</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -348,7 +348,7 @@ export default function MonthlyReportPage() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">限界利益達成率</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">限界利益達成率</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -364,7 +364,7 @@ export default function MonthlyReportPage() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">売上昨年対比</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">売上昨年対比</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -380,7 +380,7 @@ export default function MonthlyReportPage() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">限界利益率</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">限界利益率</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-orange-600">

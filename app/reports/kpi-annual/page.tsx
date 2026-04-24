@@ -184,7 +184,7 @@ export default function KpiAnnualPage() {
               className={`px-6 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
                 tab === key
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-900 hover:text-gray-700'
+                  : 'border-transparent text-gray-900 hover:text-gray-900'
               }`}
             >
               {label}
@@ -206,11 +206,11 @@ export default function KpiAnnualPage() {
               <table className="text-sm w-full border-collapse">
                 <thead className="bg-gray-50 border-b-2 border-gray-200">
                   <tr>
-                    <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-600 border-r-2 border-gray-200 min-w-[160px]">
+                    <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-200 min-w-[160px]">
                       項目
                     </th>
                     {MONTHS.map(m => (
-                      <th key={m} className="px-2 py-3 text-center font-semibold text-gray-600 border-r border-gray-200 min-w-[80px]">
+                      <th key={m} className="px-2 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[80px]">
                         {m}月
                       </th>
                     ))}
@@ -253,11 +253,11 @@ export default function KpiAnnualPage() {
               <table className="text-sm w-full border-collapse">
                 <thead className="bg-gray-50 border-b-2 border-gray-200">
                   <tr>
-                    <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-600 border-r-2 border-gray-200 min-w-[200px]">
+                    <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-200 min-w-[200px]">
                       項目
                     </th>
                     {MONTHS.map(m => (
-                      <th key={m} className="px-2 py-3 text-center font-semibold text-gray-600 border-r border-gray-200 min-w-[80px]">
+                      <th key={m} className="px-2 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[80px]">
                         {m}月
                       </th>
                     ))}
@@ -281,7 +281,7 @@ export default function KpiAnnualPage() {
                       <tr className="bg-gray-100 border-y border-gray-300">
                         <td
                           colSpan={14}
-                          className="sticky left-0 z-10 bg-gray-100 px-4 py-2 font-bold text-gray-700 border-r-2 border-gray-200"
+                          className="sticky left-0 z-10 bg-gray-100 px-4 py-2 font-bold text-gray-900 border-r-2 border-gray-200"
                         >
                           {group.mainItem}
                         </td>
@@ -291,7 +291,7 @@ export default function KpiAnnualPage() {
                         const cells = data.siteKPI.monthly[key] ?? [];
                         return (
                           <tr key={key} className="hover:bg-gray-50 border-b border-gray-100">
-                            <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2 pl-8 text-gray-700 border-r-2 border-gray-200 whitespace-nowrap">
+                            <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2 pl-8 text-gray-900 border-r-2 border-gray-200 whitespace-nowrap">
                               {subItem}
                             </td>
                             {MONTHS.map(m => {

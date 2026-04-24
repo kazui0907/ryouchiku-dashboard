@@ -190,7 +190,7 @@ export default function AnnualReportPage() {
                       { label: '営業利益', key: 'operatingProfit' as const },
                     ].map(({ label, key }) => (
                       <tr key={key} className="hover:bg-gray-50">
-                        <td className="py-3 px-3 font-medium text-gray-700">{label}</td>
+                        <td className="py-3 px-3 font-medium text-gray-900">{label}</td>
                         {data.annualTotals.map((t, i) => (
                           <td key={t.year} className="py-3 px-4 text-right font-mono tabular-nums">
                             <span className={i === 0 ? 'font-bold text-gray-900' : 'text-gray-900'}>
@@ -207,7 +207,7 @@ export default function AnnualReportPage() {
                     ))}
                     {/* 限界利益率 */}
                     <tr className="hover:bg-gray-50">
-                      <td className="py-3 px-3 font-medium text-gray-700">限界利益率</td>
+                      <td className="py-3 px-3 font-medium text-gray-900">限界利益率</td>
                       {data.annualTotals.map((t, i) => (
                         <td key={t.year} className="py-3 px-4 text-right font-mono tabular-nums">
                           <span className={i === 0 ? 'font-bold text-gray-900' : 'text-gray-900'}>
@@ -285,7 +285,7 @@ export default function AnnualReportPage() {
                         const rate   = sales > 0 ? margin / sales : 0;
                         const isEmpty = sales === 0 && margin === 0 && op === 0;
                         return (
-                          <tr key={row.month as string} className={isEmpty ? 'text-gray-300' : 'hover:bg-gray-50'}>
+                          <tr key={row.month as string} className={isEmpty ? 'text-gray-300' : 'hover:bg-gray-50 text-gray-900'}>
                             <td className="px-5 py-3 font-medium">{row.month}</td>
                             <td className="px-5 py-3 text-right tabular-nums">{isEmpty ? '—' : formatCurrency(sales)}</td>
                             <td className="px-5 py-3 text-right tabular-nums">{isEmpty ? '—' : formatCurrency(margin)}</td>

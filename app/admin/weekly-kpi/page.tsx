@@ -189,7 +189,7 @@ export default function WeeklyKPIInputPage() {
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
-                className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+                className="flex items-center text-gray-900 hover:text-gray-900 mr-4"
               >
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 戻る
@@ -254,7 +254,7 @@ export default function WeeklyKPIInputPage() {
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="border-b-2 border-gray-300">
-                    <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-700 border-r-2 border-gray-300 min-w-[180px]">
+                    <th className="sticky left-0 bg-white z-10 px-4 py-3 text-left font-semibold text-gray-900 border-r-2 border-gray-300 min-w-[180px]">
                       項目
                     </th>
                     {[1, 2, 3, 4, 5].map((week) => {
@@ -275,7 +275,7 @@ export default function WeeklyKPIInputPage() {
                       return (
                         <th
                           key={week}
-                          className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[140px]"
+                          className="px-4 py-3 text-center font-semibold text-gray-900 border-r border-gray-200 min-w-[140px]"
                         >
                           <div>第{week}週</div>
                           {dateRange && <div className="text-xs font-normal text-gray-900">{dateRange}</div>}

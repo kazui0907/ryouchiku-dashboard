@@ -62,7 +62,7 @@ export function Navbar() {
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
                         ? 'border-blue-500 text-gray-900'
-                        : 'border-transparent text-gray-900 hover:border-gray-300 hover:text-gray-700'
+                        : 'border-transparent text-gray-900 hover:border-gray-300 hover:text-gray-900'
                     }`}
                   >
                     <Icon className="h-4 w-4 mr-1" />
@@ -77,7 +77,7 @@ export function Navbar() {
             <div className="relative">
               <button
                 onClick={() => { setShowAdminMenu(!showAdminMenu); setShowExportMenu(false); }}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-900 bg-white hover:bg-gray-50"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 データ管理
@@ -92,7 +92,7 @@ export function Navbar() {
                           key={item.href}
                           href={item.href}
                           onClick={() => setShowAdminMenu(false)}
-                          className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
                         >
                           <Icon className="h-4 w-4 mr-2" />
                           {item.name}
@@ -106,7 +106,7 @@ export function Navbar() {
             <div className="relative">
               <button
                 onClick={() => { setShowExportMenu(!showExportMenu); setShowAdminMenu(false); }}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-900 bg-white hover:bg-gray-50"
               >
                 <Download className="h-4 w-4 mr-2" />
                 エクスポート
@@ -116,13 +116,13 @@ export function Navbar() {
                   <div className="py-1">
                     <button
                       onClick={handleExportExcel}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
                     >
                       Excel (年間データ)
                     </button>
                     <button
                       onClick={handleExportPDF}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
                     >
                       PDF (今月レポート)
                     </button>
@@ -135,7 +135,7 @@ export function Navbar() {
           <div className="flex items-center sm:hidden">
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-gray-700 hover:bg-gray-100"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-gray-900 hover:bg-gray-100"
             >
               {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -158,7 +158,7 @@ export function Navbar() {
                   className={`flex items-center px-4 py-3 text-base font-medium ${
                     isActive
                       ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon className="h-5 w-5 mr-3" />
@@ -176,7 +176,7 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center px-4 py-3 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  className="flex items-center px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-50 hover:text-gray-900"
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
@@ -188,14 +188,14 @@ export function Navbar() {
             <div className="px-4 py-2 text-xs font-semibold text-gray-900 uppercase">エクスポート</div>
             <button
               onClick={() => { handleExportExcel(); setShowMobileMenu(false); }}
-              className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-50 hover:text-gray-900"
             >
               <Download className="h-5 w-5 mr-3" />
               Excel (年間データ)
             </button>
             <button
               onClick={() => { handleExportPDF(); setShowMobileMenu(false); }}
-              className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-50 hover:text-gray-900"
             >
               <Download className="h-5 w-5 mr-3" />
               PDF (今月レポート)
