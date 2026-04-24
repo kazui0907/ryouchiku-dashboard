@@ -40,7 +40,7 @@ const SITE_KPI_STRUCTURE = [
   },
   {
     mainItem: '顧客満足向上',
-    subItems: ['ありがとうカード配布数', '口コミ回収率'],
+    subItems: ['ありがとうカード配布数', '口コミ回収件数'],
   },
   {
     mainItem: '不動産',

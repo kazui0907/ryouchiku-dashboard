@@ -19,7 +19,7 @@ const SITE_KPI_STRUCTURE: { mainItem: string; subItems: string[] }[] = [
   { mainItem: '商談件数', subItems: ['追客架電（商談前）', 'メイン商材ない人にアクション'] },
   { mainItem: '受注件数', subItems: ['ロープレ回数', '新規商談平均粗利額', '景山', '京屋', '中谷', '熊田', '大島', '森谷', '星野', '安栗', 'SR'] },
   { mainItem: '平均限界利益額', subItems: ['新規商談平均粗利額', '景山', '京屋', '中谷', '熊田', '大島', '森谷', '星野', '安栗', 'SR', '京屋', '熊田', '星野', '安栗'] },
-  { mainItem: '顧客満足向上', subItems: ['ありがとうカード配布数', '口コミ回収率'] },
+  { mainItem: '顧客満足向上', subItems: ['ありがとうカード配布数', '口コミ回収件数'] },
   { mainItem: '不動産', subItems: ['交渉物件数'] },
   { mainItem: 'IT', subItems: ['商談件数', '成約率'] },
 ];

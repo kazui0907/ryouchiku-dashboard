@@ -94,12 +94,34 @@ async function parsePL(rows: string[][], year: number) {
     }
   }
 
+  // 予算ウィザードで入力済みの budget を (category::subcategory) で保持しておく
+  // 明細行は deleteMany → create 方式で丸ごと入れ替えるため、予算だけ別途マージする
+  const existingLineItems = await prisma.accountingLineItem.findMany({ where: { year } });
+  const budgetByKey = new Map<string, Map<number, number | null>>();
+  for (const item of existingLineItems) {
+    const key = `${item.category}::${item.subcategory}`;
+    try {
+      const months = JSON.parse(item.monthsJson || '[]');
+      const budgetMap = new Map<number, number | null>();
+      for (const m of months) {
+        if (m.budget !== null && m.budget !== undefined) {
+          budgetMap.set(m.month, m.budget);
+        }
+      }
+      if (budgetMap.size > 0) budgetByKey.set(key, budgetMap);
+    } catch {
+      // 破損JSONは無視
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const txOps: any[] = [];
   let importCount = 0;
   let lineItemCount = 0;
 
   // 1. MonthlyAccounting（月次サマリー）
+  //    CSV = 真実 として 1〜12月すべて upsert する。空月は 0 / null で上書きし、古いデータを残さない。
+  //    budget 系・lastYear 系は update 対象に含めない（budget-wizard の入力を保護）。
   for (let month = 1; month <= 12; month++) {
     const idx = month - 1;
     const salesRevenue  = summary['売上高合計']?.[idx]                    ?? 0;
@@ -114,9 +136,6 @@ async function parsePL(rows: string[][], year: number) {
     const laborBonus = accounts['労務費賞与']?.[idx] ?? 0;
     const marginProfit     = grossProfit + laborCost + laborBonus;
     const marginProfitRate = salesRevenue > 0 ? marginProfit / salesRevenue : 0;
-
-    // データが全くない月はスキップ
-    if (salesRevenue === 0 && grossProfit === 0 && operatingProfit === null) continue;
 
     txOps.push(
       prisma.monthlyAccounting.upsert({
@@ -138,7 +157,11 @@ async function parsePL(rows: string[][], year: number) {
   }
 
   // 2. AccountingLineItem（明細行）
-  // ヘッダー行をスキップしつつ、値を持つ行を保存
+  //    CSV = 真実 の徹底のため、当該年度の明細行を一度すべて削除してから新規投入する。
+  //    これにより古い行（CSVから消えた勘定科目）が残留しなくなる。
+  //    budget（予算ウィザード入力）は (category::subcategory) ベースで事前退避し、再投入時にマージする。
+  txOps.push(prisma.accountingLineItem.deleteMany({ where: { year } }));
+
   let rowIndex = 0;
   let currentSection = '';
   for (const row of rows.slice(1)) {
@@ -147,8 +170,13 @@ async function parsePL(rows: string[][], year: number) {
     const col1 = (row[1] || '').trim();
     const col2 = (row[2] || '').trim();
 
-    // セクションヘッダー（例: "売上高", "売上原価"）- 値なし行はスキップ
-    if (col0 && !col1 && !col2) {
+    // 月次データ（col3〜col14 = 1月〜12月）を先に取得
+    const monthActuals = Array.from({ length: 12 }, (_, i) => parseNum(row[i + 3]));
+    const hasAnyMonthValue = monthActuals.some((v) => v !== null);
+
+    // セクションヘッダー判定: col0 にラベルのみ + 月次値が全く無い行だけがヘッダー。
+    // 合計行（例: "売上高合計"）は col0 にラベルがあるが月次値も持つため、ヘッダー扱いしない。
+    if (col0 && !col1 && !col2 && !hasAnyMonthValue) {
       currentSection = col0;
       continue;
     }
@@ -169,22 +197,26 @@ async function parsePL(rows: string[][], year: number) {
       continue;
     }
 
-    // 月次データ（col3〜col14 = 1月〜12月）
-    const months = Array.from({ length: 12 }, (_, i) => ({
-      month: i + 1,
-      lastYear: null as number | null,
-      budget: null as number | null,
-      actual: parseNum(row[i + 3]),
-    }));
+    // budget を退避領域から復元しつつ月次オブジェクトを組み立てる
+    const key = `${category}::${subcategory}`;
+    const budgetMap = budgetByKey.get(key);
+    const months = monthActuals.map((actual, i) => {
+      const m = i + 1;
+      return {
+        month: m,
+        lastYear: null as number | null,
+        budget: budgetMap?.get(m) ?? null,
+        actual,
+      };
+    });
 
-    // 全月データなしの行はスキップ
-    if (months.every(m => m.actual === null)) continue;
+    // 実績も予算も全く無い行は保存しない
+    const hasAnyBudget = months.some((m) => m.budget !== null);
+    if (!hasAnyMonthValue && !hasAnyBudget) continue;
 
     txOps.push(
-      prisma.accountingLineItem.upsert({
-        where: { year_rowIndex: { year, rowIndex } },
-        update: { category, subcategory, monthsJson: JSON.stringify(months) },
-        create: { year, rowIndex, category, subcategory, monthsJson: JSON.stringify(months) },
+      prisma.accountingLineItem.create({
+        data: { year, rowIndex, category, subcategory, monthsJson: JSON.stringify(months) },
       })
     );
     lineItemCount++;
@@ -224,11 +256,12 @@ async function parseBS(rows: string[][], year: number) {
   const txOps: any[] = [];
   let importCount = 0;
 
+  // CSV = 真実 の徹底のため、当該年度の貸借対照表レコードを一度すべて削除してから新規投入する。
+  // これにより、CSVから消えた月のデータ（古い残留値）が残らない。
+  txOps.push(prisma.balanceSheet.deleteMany({ where: { year } }));
+
   for (let month = 1; month <= 12; month++) {
     const idx = month - 1;
-    const totalAssets = summary['資産の部合計']?.[idx] ?? null;
-    if (totalAssets === null) continue; // データなし月はスキップ
-
     const data = Object.fromEntries(
       Object.entries(BS_FIELD_MAP).map(([label, field]) => [
         field,
@@ -236,11 +269,13 @@ async function parseBS(rows: string[][], year: number) {
       ])
     );
 
+    // 全フィールド null の月は保存しない（行を作らない）
+    const hasAnyValue = Object.values(data).some((v) => v !== null);
+    if (!hasAnyValue) continue;
+
     txOps.push(
-      prisma.balanceSheet.upsert({
-        where: { year_month: { year, month } },
-        update: data,
-        create: { year, month, ...data },
+      prisma.balanceSheet.create({
+        data: { year, month, ...data },
       })
     );
     importCount++;
