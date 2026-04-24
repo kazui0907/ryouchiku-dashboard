@@ -351,7 +351,7 @@ export default function WeeklySiteKPIInputPage() {
                                   <div className="relative flex items-center">
                                     <input
                                       type="number"
-                                      step="0.01"
+                                      step={isPercentItem(subItem) ? '0.01' : '1'}
                                       value={weekData?.actual || ''}
                                       onChange={(e) =>
                                         handleInputChange(key, `week${week}`, 'actual', e.target.value)

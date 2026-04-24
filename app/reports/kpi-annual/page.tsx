@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
@@ -272,10 +272,13 @@ export default function KpiAnnualPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {siteGroups.map(group => (
-                    <>
+                  {siteGroups.map((group, groupIdx) => (
+                    // Fragment にユニークな key を付与しないと React 19 でエラーになる。
+                    // mainItem はDB由来で重複し得る（例: SITE_KPI_ORDER に無いゴミ項目で "IT" が2回出るなど）。
+                    // groupIdx を混ぜて必ずユニークにする。
+                    <React.Fragment key={`group-${groupIdx}-${group.mainItem}`}>
                       {/* カテゴリ見出し */}
-                      <tr key={`hd-${group.mainItem}`} className="bg-gray-100 border-y border-gray-300">
+                      <tr className="bg-gray-100 border-y border-gray-300">
                         <td
                           colSpan={14}
                           className="sticky left-0 z-10 bg-gray-100 px-4 py-2 font-bold text-gray-700 border-r-2 border-gray-200"
@@ -299,7 +302,7 @@ export default function KpiAnnualPage() {
                           </tr>
                         );
                       })}
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
