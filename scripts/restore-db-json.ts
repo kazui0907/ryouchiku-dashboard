@@ -25,6 +25,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 
+// .env を自動ロード（Node 20.12+ の process.loadEnvFile）
+try {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (process as any).loadEnvFile?.('.env');
+} catch {
+  // .env がない／既にロード済みなら無視
+}
+
 const prisma = new PrismaClient();
 
 const MODELS = [

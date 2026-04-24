@@ -1,0 +1,14 @@
+{
+  "backupAt": "2026-04-24T13:54:28.114Z",
+  "prismaVersion": "5.22.0",
+  "rowCounts": {
+    "monthlyAccounting": 48,
+    "weeklyKPI": 144,
+    "weeklySiteKPI": 315,
+    "personalKPI": 0,
+    "accountingLineItem": 434,
+    "balanceSheet": 47,
+    "budget": 0
+  },
+  "totalRows": 988
+}

@@ -28,6 +28,14 @@
 //
 import { PrismaClient } from '@prisma/client';
 
+// .env を自動ロード（Node 20.12+ の process.loadEnvFile）
+try {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (process as any).loadEnvFile?.('.env');
+} catch {
+  // .env がない／既にロード済みなら無視
+}
+
 const prisma = new PrismaClient();
 
 async function main() {

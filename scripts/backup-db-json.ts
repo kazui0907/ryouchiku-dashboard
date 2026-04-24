@@ -26,6 +26,15 @@ import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// .env を自動ロード（Node 20.12+ の process.loadEnvFile）
+// これにより `npx tsx scripts/backup-db-json.ts` だけで DATABASE_URL を読み込める
+try {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (process as any).loadEnvFile?.('.env');
+} catch {
+  // .env がない／既にロード済みなら無視
+}
+
 const prisma = new PrismaClient();
 
 // schema.prisma に定義されている全モデル
