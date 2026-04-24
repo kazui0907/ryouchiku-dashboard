@@ -72,7 +72,7 @@ interface MetricChartProps {
 function MetricChart({ data, years, metricKey, title }: MetricChartProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <h3 className="text-base font-semibold text-gray-800 mb-4">{title}</h3>
+      <h3 className="text-base font-semibold text-gray-900 mb-4">{title}</h3>
       <ResponsiveContainer width="100%" height={260}>
         <LineChart data={data} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

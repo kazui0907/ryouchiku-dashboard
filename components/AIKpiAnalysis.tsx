@@ -18,7 +18,7 @@ function renderMarkdown(text: string) {
   for (const line of lines) {
     if (line.startsWith('## ')) {
       elements.push(
-        <h2 key={key++} className="text-base font-bold text-gray-800 mt-5 mb-2 pb-1 border-b border-gray-200">
+        <h2 key={key++} className="text-base font-bold text-gray-900 mt-5 mb-2 pb-1 border-b border-gray-200">
           {line.slice(3)}
         </h2>
       );

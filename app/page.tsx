@@ -911,7 +911,7 @@ export default function Dashboard() {
                         <>
                           {/* カテゴリヘッダー行 */}
                           <tr key={`header-${group.mainItem}`} className="bg-gray-100 border-b border-gray-300">
-                            <td colSpan={7} className="sticky left-0 bg-gray-100 z-10 px-4 py-2 font-bold text-gray-800 border-r-2 border-gray-300 text-base">
+                            <td colSpan={7} className="sticky left-0 bg-gray-100 z-10 px-4 py-2 font-bold text-gray-900 border-r-2 border-gray-300 text-base">
                               {group.mainItem}
                             </td>
                           </tr>

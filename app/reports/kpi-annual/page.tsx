@@ -229,7 +229,7 @@ export default function KpiAnnualPage() {
                     const cells = data.weeklyKPI.monthly[itemName] ?? [];
                     return (
                       <tr key={itemName} className="hover:bg-gray-50">
-                        <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2 font-medium text-gray-800 border-r-2 border-gray-200 whitespace-nowrap">
+                        <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2 font-medium text-gray-900 border-r-2 border-gray-200 whitespace-nowrap">
                           {itemName}
                         </td>
                         {MONTHS.map(m => {

@@ -77,7 +77,7 @@ function CustomTooltip({ active, payload, label }: {
       {payload.map((p) => (
         <div key={p.name} className="flex justify-between gap-4">
           <span style={{ color: p.fill }} className="font-medium">{p.name}</span>
-          <span className="tabular-nums text-gray-800">{formatCompactCurrency(p.value)}</span>
+          <span className="tabular-nums text-gray-900">{formatCompactCurrency(p.value)}</span>
         </div>
       ))}
     </div>
@@ -168,7 +168,7 @@ export default function BalanceSheetPage() {
             {/* ---- 資産構成グラフ（積み上げ面グラフ） ---- */}
             <section>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-base font-semibold text-gray-800 mb-1">資産構成の推移</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">資産構成の推移</h3>
                 <p className="text-xs text-gray-900 mb-4">流動資産・固定資産の積み上げ（= 総資産）</p>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
@@ -199,7 +199,7 @@ export default function BalanceSheetPage() {
             {/* ---- 負債・純資産グラフ（積み上げ棒グラフ） ---- */}
             <section>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-base font-semibold text-gray-800 mb-1">負債・純資産の構成推移</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">負債・純資産の構成推移</h3>
                 <p className="text-xs text-gray-900 mb-4">流動負債 + 固定負債 + 純資産 = 総資産</p>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
@@ -219,7 +219,7 @@ export default function BalanceSheetPage() {
             {/* ---- 現金・売上債権・棚卸 折れ線 ---- */}
             <section>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-base font-semibold text-gray-800 mb-1">流動資産の内訳推移</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">流動資産の内訳推移</h3>
                 <p className="text-xs text-gray-900 mb-4">現金預金・売上債権・棚卸資産の月次変化</p>
                 <ResponsiveContainer width="100%" height={260}>
                   <AreaChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>

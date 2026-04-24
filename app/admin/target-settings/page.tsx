@@ -528,7 +528,7 @@ export default function TargetSettingsPage() {
                     {SITE_KPI_STRUCTURE.map(({ mainItem, subItems }) => (
                       <>
                         <tr key={`header-${mainItem}`} className="bg-gray-100 border-b border-gray-300">
-                          <td colSpan={6} className="sticky left-0 bg-gray-100 z-10 px-4 py-2 font-bold text-gray-800 border-r-2 border-gray-300">
+                          <td colSpan={6} className="sticky left-0 bg-gray-100 z-10 px-4 py-2 font-bold text-gray-900 border-r-2 border-gray-300">
                             {mainItem}
                           </td>
                         </tr>
