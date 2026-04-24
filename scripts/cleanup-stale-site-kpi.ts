@@ -123,27 +123,110 @@ async function main() {
 
   // 実行モード
   console.log('');
-  console.log('削除を実行します...');
+  console.log('--- Step 1: データ救済（値が入っているゴミレコードは正規側にコピー） ---');
+
+  // 救済ロジック:
+  //   ゴミレコードに target/actual/rate のいずれかに値が入っている場合、
+  //   同じ (year, month, mainItem) で正規の subItem が SITE_KPI_STRUCTURE に
+  //   1つしかない mainItem に限り、そちらに値をコピーする（正規側が空の場合のみ）。
+  //   今回の対象は IT::成約率\n... → IT::成約率 のケース。
+  //   安全のため mainItem ごとに正規 subItem が1つの時だけ自動救済する。
+  const mainItemSingleSub = new Map<string, string>();
+  for (const { mainItem, subItems } of VALID_STRUCTURE) {
+    // subItem が「成約率」のように一意なもの、または subItems が1件のみの mainItem を対象
+    // 今回は mainItem=IT で成約率と商談件数があり、ゴミは「成約率\n...」から始まるので
+    // startsWith マッチで候補 subItem を推定する
+    for (const sub of subItems) {
+      if (!mainItemSingleSub.has(`${mainItem}::${sub}`)) {
+        mainItemSingleSub.set(`${mainItem}::${sub}`, sub);
+      }
+    }
+  }
+
+  let salvagedCount = 0;
+  for (const key of staleKeys) {
+    const [mainItem, ...subParts] = key.split('::');
+    const subItem = subParts.join('::');
+    const rows = byKey.get(key) ?? [];
+    for (const r of rows) {
+      const hasValue = [1, 2, 3, 4, 5].some((w) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rec: any = r;
+        return rec[`week${w}Target`] != null || rec[`week${w}Actual`] != null;
+      });
+      if (!hasValue) continue;
+
+      // 正規の subItem 候補を推定: 「subItem の先頭部分が正規 subItem と一致」
+      // 例: 成約率\n合計注文数... → 成約率
+      const validSubsForMain = VALID_STRUCTURE.find((s) => s.mainItem === mainItem)?.subItems ?? [];
+      const candidate = validSubsForMain.find((vs) => subItem.startsWith(vs) || vs.startsWith(subItem.split('\n')[0] || subItem));
+      if (!candidate) {
+        console.log(`  ⚠️  ${mainItem}::${subItem.replace(/\n/g, '\\n')} [${r.year}/${r.month}月] 値があるが救済先が特定できない → 値は失われます`);
+        continue;
+      }
+
+      const cleanWhere = { year: r.year, month: r.month, mainItem, subItem: candidate };
+      const clean = await prisma.weeklySiteKPI.findUnique({
+        where: { year_month_mainItem_subItem: cleanWhere },
+      });
+      const cleanIsEmpty = !clean || [1, 2, 3, 4, 5].every((w) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const c: any = clean;
+        return c?.[`week${w}Target`] == null && c?.[`week${w}Actual`] == null;
+      });
+
+      if (!cleanIsEmpty) {
+        console.log(`  ⚠️  ${mainItem}::${candidate} [${r.year}/${r.month}月] 正規側に既に値があるため救済をスキップ`);
+        continue;
+      }
+
+      // 値をコピー
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const src: any = r;
+      const data: Record<string, number | null> = {};
+      for (let w = 1; w <= 5; w++) {
+        data[`week${w}Target`] = src[`week${w}Target`] ?? null;
+        data[`week${w}Actual`] = src[`week${w}Actual`] ?? null;
+        data[`week${w}Rate`] = src[`week${w}Rate`] ?? null;
+      }
+
+      if (clean) {
+        await prisma.weeklySiteKPI.update({
+          where: { year_month_mainItem_subItem: cleanWhere },
+          data,
+        });
+      } else {
+        await prisma.weeklySiteKPI.create({
+          data: { year: r.year, month: r.month, mainItem, subItem: candidate, ...data },
+        });
+      }
+      salvagedCount++;
+      console.log(`  ✅ ${mainItem}::${subItem.replace(/\n/g, '\\n')} [${r.year}/${r.month}月] → ${mainItem}::${candidate} に値をコピー`);
+    }
+  }
+
+  console.log('');
+  console.log(`救済件数: ${salvagedCount}`);
+  console.log('');
+  console.log('--- Step 2: ゴミレコード削除 ---');
 
   const deleteResults: { key: string; count: number }[] = [];
   for (const key of staleKeys) {
     const [mainItem, ...subParts] = key.split('::');
-    const subItem = subParts.join('::'); // subItem に :: が含まれる可能性に備えて
+    const subItem = subParts.join('::');
     const result = await prisma.weeklySiteKPI.deleteMany({
       where: { mainItem, subItem },
     });
     deleteResults.push({ key, count: result.count });
   }
 
-  console.log('');
-  console.log('--- 削除結果 ---');
   for (const r of deleteResults) {
     const displayKey = r.key.replace(/\n/g, '\\n').replace(/\t/g, '\\t');
     console.log(`  🗑  ${displayKey}: ${r.count} 件削除`);
   }
   const grandTotal = deleteResults.reduce((s, r) => s + r.count, 0);
   console.log('');
-  console.log(`✅ 完了: 合計 ${grandTotal} レコードを削除しました`);
+  console.log(`✅ 完了: ${salvagedCount} 件救済 + ${grandTotal} レコード削除`);
 }
 
 main()
