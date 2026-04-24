@@ -293,7 +293,7 @@ export default function TargetSettingsPage() {
     `px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
       activeTab === tab
         ? 'border-blue-500 text-blue-600'
-        : 'border-transparent text-gray-500 hover:text-gray-700'
+        : 'border-transparent text-gray-900 hover:text-gray-700'
     }`;
 
   return (
@@ -432,7 +432,7 @@ export default function TargetSettingsPage() {
                         return (
                           <th key={w} className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]">
                             <div>第{w}週</div>
-                            {range && <div className="text-xs font-normal text-gray-500">{range}</div>}
+                            {range && <div className="text-xs font-normal text-gray-900">{range}</div>}
                           </th>
                         );
                       })}
@@ -462,11 +462,11 @@ export default function TargetSettingsPage() {
                                     placeholder="-"
                                   />
                                   {isKpiPercent(itemName) && (
-                                    <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                                    <span className="absolute right-1 text-xs text-gray-900 pointer-events-none">%</span>
                                   )}
                                 </div>
                               ) : (
-                                <div className="text-center text-gray-400 text-xs">—</div>
+                                <div className="text-center text-gray-900 text-xs">—</div>
                               )}
                             </td>
                           );
@@ -518,7 +518,7 @@ export default function TargetSettingsPage() {
                         return (
                           <th key={w} className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]">
                             <div>第{w}週</div>
-                            {range && <div className="text-xs font-normal text-gray-500">{range}</div>}
+                            {range && <div className="text-xs font-normal text-gray-900">{range}</div>}
                           </th>
                         );
                       })}
@@ -557,11 +557,11 @@ export default function TargetSettingsPage() {
                                           placeholder="-"
                                         />
                                         {isSitePercent(subItem) && (
-                                          <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                                          <span className="absolute right-1 text-xs text-gray-900 pointer-events-none">%</span>
                                         )}
                                       </div>
                                     ) : (
-                                      <div className="text-center text-gray-400 text-xs">—</div>
+                                      <div className="text-center text-gray-900 text-xs">—</div>
                                     )}
                                   </td>
                                 );

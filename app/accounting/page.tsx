@@ -232,14 +232,14 @@ export default function AccountingPage() {
                                     <>
                                       {/* 目標 */}
                                       {budget !== null && (
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-900">
                                           目標: {formatCurrency(budget)}
                                         </div>
                                       )}
 
                                       {/* 昨年 */}
                                       {lastYear !== null && (
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-900">
                                           昨年: {formatCurrency(lastYear)}
                                         </div>
                                       )}

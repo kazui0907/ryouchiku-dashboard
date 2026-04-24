@@ -341,7 +341,7 @@ export default function BudgetWizardPage() {
                         ? 'bg-blue-600 text-white'
                         : step > i + 1
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-500'
+                        : 'bg-gray-100 text-gray-900'
                     }`}
                   >
                     {label}
@@ -372,7 +372,7 @@ export default function BudgetWizardPage() {
               <CardTitle>年間目標を入力</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-gray-900 mb-6">
                 年間の目標数字を入力して「計算」を押すと、過去3カ年の月次比率をもとに月別予算が自動計算されます。
               </p>
               <div className="flex items-center gap-3 mb-6">
@@ -404,10 +404,10 @@ export default function BudgetWizardPage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                         placeholder="例: 100000000"
                       />
-                      <span className="text-sm text-gray-500 whitespace-nowrap">円</span>
+                      <span className="text-sm text-gray-900 whitespace-nowrap">円</span>
                     </div>
                     {annualTargets[key] && (
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-900 mt-1">
                         = ¥{parseInput(annualTargets[key])?.toLocaleString('ja-JP') ?? '—'}
                       </p>
                     )}
@@ -435,7 +435,7 @@ export default function BudgetWizardPage() {
               <CardTitle>月次予算配分を確認・調整</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-900 mb-4">
                 過去3カ年の月次実績比率で自動計算しました。数値を調整してから「詳細項目へ」を押してください。
               </p>
               <div className="overflow-x-auto">
@@ -499,17 +499,17 @@ export default function BudgetWizardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>詳細費用項目を確認・調整</CardTitle>
-                <span className="text-sm text-gray-500">費用を変更すると利益が自動で再計算されます</span>
+                <span className="text-sm text-gray-900">費用を変更すると利益が自動で再計算されます</span>
               </div>
             </CardHeader>
             <CardContent>
               <div className="mb-3 flex gap-4 text-xs items-center">
                 <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 bg-blue-100 border border-blue-300 rounded"></span>集計・利益行（自動計算）</span>
                 <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 bg-white border border-gray-300 rounded"></span>費用明細（編集可）</span>
-                <span className="ml-auto text-gray-400">{lineItems.length}行読み込み済み（参照年度: {apiData?.lineItemsYear ?? '—'}年）</span>
+                <span className="ml-auto text-gray-900">{lineItems.length}行読み込み済み（参照年度: {apiData?.lineItemsYear ?? '—'}年）</span>
               </div>
               {lineItems.length === 0 && (
-                <div className="p-6 text-center text-gray-500 bg-yellow-50 rounded-lg mb-4">
+                <div className="p-6 text-center text-gray-900 bg-yellow-50 rounded-lg mb-4">
                   費用項目が見つかりません。先に「CSVアップロード」から月次予測CSVを登録してください。
                 </div>
               )}
@@ -556,7 +556,7 @@ export default function BudgetWizardPage() {
                             }`}
                           >
                             <div>{li.category}</div>
-                            {li.subcategory && <div className="text-gray-400 pl-2">{li.subcategory}</div>}
+                            {li.subcategory && <div className="text-gray-900 pl-2">{li.subcategory}</div>}
                           </td>
                           {li.monthBudgets.map((budget, mi) => (
                             <td key={mi} className="px-1 py-1">
@@ -681,7 +681,7 @@ export default function BudgetWizardPage() {
                           <tr key={li.rowIndex} className={`border-b border-gray-200 ${isDerived ? 'bg-blue-50 font-semibold' : ''}`}>
                             <td className="px-3 py-2">
                               <span>{li.category}</span>
-                              {li.subcategory && <span className="text-gray-400 ml-2 text-xs">{li.subcategory}</span>}
+                              {li.subcategory && <span className="text-gray-900 ml-2 text-xs">{li.subcategory}</span>}
                             </td>
                             <td className={`px-3 py-2 text-right ${isDerived && annual < 0 ? 'text-red-600' : ''}`}>
                               {li.category === '限界利益率' ? '—' : annual !== 0 ? `¥${annual.toLocaleString('ja-JP')}` : '—'}

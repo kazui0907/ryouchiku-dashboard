@@ -214,7 +214,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-3xl font-bold text-gray-900">経営ダッシュボード</h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-900">
                 選択中: {selectedYear}年{selectedMonth}月
               </p>
             </div>
@@ -298,7 +298,7 @@ export default function Dashboard() {
                 <option key={m} value={m}>{m}月</option>
               ))}
             </select>
-            <span className="text-sm text-gray-500">〜</span>
+            <span className="text-sm text-gray-900">〜</span>
             <select
               value={toMonth}
               onChange={(e) => {
@@ -330,18 +330,18 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">売上高</CardTitle>
-              <DollarSign className="h-4 w-4 text-gray-400" />
+              <DollarSign className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">今月実績</div>
+                  <div className="text-xs text-gray-900 mb-1">今月実績</div>
                   <div className="text-lg font-bold">
                     {formatCurrency(currentMonth.salesRevenue)}
                   </div>
                   {currentMonth.budgetSales && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         currentMonth.salesRevenue / currentMonth.budgetSales >= 1.0
                           ? 'text-green-600'
@@ -356,26 +356,26 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">目標:</span>
+                    <span className="text-gray-900">目標:</span>
                     <span className="font-semibold">
                       {currentMonth.budgetSales ? formatCurrency(currentMonth.budgetSales) : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">昨年:</span>
+                    <span className="text-gray-900">昨年:</span>
                     <span className="font-semibold">
                       {currentMonth.lastYearSalesRevenue ? formatCurrency(currentMonth.lastYearSalesRevenue) : '—'}
                     </span>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
+                  <div className="text-xs text-gray-900 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {formatCurrency(ytd.salesRevenue)}
                   </div>
                   {ytd.budgetSales > 0 && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         ytd.salesRevenue / ytd.budgetSales >= 1.0
                           ? 'text-green-600'
@@ -389,13 +389,13 @@ export default function Dashboard() {
                   )}
                   <div className="space-y-1 text-xs mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">目標:</span>
+                      <span className="text-gray-900">目標:</span>
                       <span className="font-semibold">
                         {formatCurrency(ytd.budgetSales)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">昨年:</span>
+                      <span className="text-gray-900">昨年:</span>
                       <span className="font-semibold">
                         {formatCurrency(ytd.lastYearSalesRevenue)}
                       </span>
@@ -410,12 +410,12 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">限界利益</CardTitle>
-              <Target className="h-4 w-4 text-gray-400" />
+              <Target className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">今月実績</div>
+                  <div className="text-xs text-gray-900 mb-1">今月実績</div>
                   <div className="text-lg font-bold">
                     {formatCurrency(currentMonth.marginProfit || 0)}
                   </div>
@@ -424,7 +424,7 @@ export default function Dashboard() {
                   </div>
                   {currentMonth.budgetMarginProfit && currentMonth.marginProfit !== null && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         currentMonth.marginProfit / currentMonth.budgetMarginProfit >= 1.0
                           ? 'text-green-600'
@@ -439,26 +439,26 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">目標:</span>
+                    <span className="text-gray-900">目標:</span>
                     <span className="font-semibold">
                       {currentMonth.budgetMarginProfit ? formatCurrency(currentMonth.budgetMarginProfit) : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">昨年:</span>
+                    <span className="text-gray-900">昨年:</span>
                     <span className="font-semibold">
                       {currentMonth.lastYearMarginProfit ? formatCurrency(currentMonth.lastYearMarginProfit) : '—'}
                     </span>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
+                  <div className="text-xs text-gray-900 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {formatCurrency(ytd.marginProfit)}
                   </div>
                   {ytd.budgetMarginProfit > 0 && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         ytd.marginProfit / ytd.budgetMarginProfit >= 1.0
                           ? 'text-green-600'
@@ -472,13 +472,13 @@ export default function Dashboard() {
                   )}
                   <div className="space-y-1 text-xs mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">目標:</span>
+                      <span className="text-gray-900">目標:</span>
                       <span className="font-semibold">
                         {formatCurrency(ytd.budgetMarginProfit)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">昨年:</span>
+                      <span className="text-gray-900">昨年:</span>
                       <span className="font-semibold">
                         {formatCurrency(ytd.lastYearMarginProfit)}
                       </span>
@@ -493,12 +493,12 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">売上総利益</CardTitle>
-              <Target className="h-4 w-4 text-gray-400" />
+              <Target className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">今月実績</div>
+                  <div className="text-xs text-gray-900 mb-1">今月実績</div>
                   <div className="text-lg font-bold">
                     {formatCurrency(currentMonth.grossProfit)}
                   </div>
@@ -507,7 +507,7 @@ export default function Dashboard() {
                   </div>
                   {currentMonth.budgetGrossProfit && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         currentMonth.grossProfit / currentMonth.budgetGrossProfit >= 1.0
                           ? 'text-green-600'
@@ -522,26 +522,26 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">目標:</span>
+                    <span className="text-gray-900">目標:</span>
                     <span className="font-semibold">
                       {currentMonth.budgetGrossProfit ? formatCurrency(currentMonth.budgetGrossProfit) : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">昨年:</span>
+                    <span className="text-gray-900">昨年:</span>
                     <span className="font-semibold">
                       {currentMonth.lastYearGrossProfit ? formatCurrency(currentMonth.lastYearGrossProfit) : '—'}
                     </span>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
+                  <div className="text-xs text-gray-900 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {formatCurrency(ytd.grossProfit)}
                   </div>
                   {ytd.budgetGrossProfit > 0 && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         ytd.grossProfit / ytd.budgetGrossProfit >= 1.0
                           ? 'text-green-600'
@@ -555,13 +555,13 @@ export default function Dashboard() {
                   )}
                   <div className="space-y-1 text-xs mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">目標:</span>
+                      <span className="text-gray-900">目標:</span>
                       <span className="font-semibold">
                         {formatCurrency(ytd.budgetGrossProfit)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">昨年:</span>
+                      <span className="text-gray-900">昨年:</span>
                       <span className="font-semibold">
                         {formatCurrency(ytd.lastYearGrossProfit)}
                       </span>
@@ -576,12 +576,12 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">営業利益</CardTitle>
-              <Users className="h-4 w-4 text-gray-400" />
+              <Users className="h-4 w-4 text-gray-900" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">今月実績</div>
+                  <div className="text-xs text-gray-900 mb-1">今月実績</div>
                   <div className="text-lg font-bold">
                     {currentMonth.operatingProfit !== null
                       ? formatCurrency(currentMonth.operatingProfit)
@@ -594,7 +594,7 @@ export default function Dashboard() {
                   )}
                   {currentMonth.budgetOperatingProfit !== null && currentMonth.budgetOperatingProfit !== 0 && currentMonth.operatingProfit !== null && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         currentMonth.operatingProfit / currentMonth.budgetOperatingProfit >= 1.0
                           ? 'text-green-600'
@@ -609,20 +609,20 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">目標:</span>
+                    <span className="text-gray-900">目標:</span>
                     <span className="font-semibold">
                       {currentMonth.budgetOperatingProfit !== null ? formatCurrency(currentMonth.budgetOperatingProfit) : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">昨年:</span>
+                    <span className="text-gray-900">昨年:</span>
                     <span className="font-semibold">
                       {currentMonth.lastYearOperatingProfit !== null ? formatCurrency(currentMonth.lastYearOperatingProfit) : '—'}
                     </span>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
+                  <div className="text-xs text-gray-900 mb-1">期間累計（{fromMonth}月〜{toMonth}月）</div>
                   <div className="text-base font-semibold text-blue-600">
                     {ytd.operatingProfit !== null && ytd.operatingProfit !== undefined
                       ? formatCurrency(ytd.operatingProfit)
@@ -630,7 +630,7 @@ export default function Dashboard() {
                   </div>
                   {ytd.budgetOperatingProfit !== null && ytd.budgetOperatingProfit !== 0 && ytd.operatingProfit !== null && (
                     <div className="text-sm mt-1">
-                      <span className="text-gray-500">達成率: </span>
+                      <span className="text-gray-900">達成率: </span>
                       <span className={`text-base font-bold ${
                         ytd.operatingProfit / ytd.budgetOperatingProfit >= 1.0
                           ? 'text-green-600'
@@ -644,13 +644,13 @@ export default function Dashboard() {
                   )}
                   <div className="space-y-1 text-xs mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">目標:</span>
+                      <span className="text-gray-900">目標:</span>
                       <span className="font-semibold">
                         {ytd.budgetOperatingProfit !== null && ytd.budgetOperatingProfit !== undefined ? formatCurrency(ytd.budgetOperatingProfit) : '—'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">昨年:</span>
+                      <span className="text-gray-900">昨年:</span>
                       <span className="font-semibold">
                         {ytd.lastYearOperatingProfit !== null && ytd.lastYearOperatingProfit !== undefined ? formatCurrency(ytd.lastYearOperatingProfit) : '—'}
                       </span>
@@ -669,7 +669,7 @@ export default function Dashboard() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>週次KPI進捗（積極版）</CardTitle>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-900">
                   全{weeklyKPIData.items.length}項目
                 </div>
               </div>
@@ -732,7 +732,7 @@ export default function Dashboard() {
                             className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]"
                           >
                             <div>第{week}週</div>
-                            {dateRange && <div className="text-xs font-normal text-gray-500">{dateRange}</div>}
+                            {dateRange && <div className="text-xs font-normal text-gray-900">{dateRange}</div>}
                           </th>
                         );
                       })}
@@ -773,7 +773,7 @@ export default function Dashboard() {
                             if (!weekData) {
                               return (
                                 <td key={weekNum} className="px-2 py-3 text-center border-r border-gray-200">
-                                  <div className="text-gray-400">—</div>
+                                  <div className="text-gray-900">—</div>
                                 </td>
                               );
                             }
@@ -787,7 +787,7 @@ export default function Dashboard() {
                                   </div>
                                   {/* 目標数 */}
                                   {weekData.target !== null && (
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-gray-900">
                                       {formatValue(weekData.target)}
                                     </div>
                                   )}
@@ -866,7 +866,7 @@ export default function Dashboard() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>週次現場KPI進捗</CardTitle>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-900">
                     全{weeklySiteKPIData.items.length}項目
                   </div>
                 </div>
@@ -897,7 +897,7 @@ export default function Dashboard() {
                           return (
                             <th key={week} className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[120px]">
                               <div>第{week}週</div>
-                              {dateRange && <div className="text-xs font-normal text-gray-500">{dateRange}</div>}
+                              {dateRange && <div className="text-xs font-normal text-gray-900">{dateRange}</div>}
                             </th>
                           );
                         })}
@@ -926,7 +926,7 @@ export default function Dashboard() {
                                 if (!weekData) {
                                   return (
                                     <td key={weekNum} className="px-2 py-3 text-center border-r border-gray-200">
-                                      <div className="text-gray-400">—</div>
+                                      <div className="text-gray-900">—</div>
                                     </td>
                                   );
                                 }
@@ -937,7 +937,7 @@ export default function Dashboard() {
                                         {formatSiteValue(weekData.actual, item.subName, item.name)}
                                       </div>
                                       {weekData.target !== null && (
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-900">
                                           {formatSiteValue(weekData.target, item.subName, item.name)}
                                         </div>
                                       )}

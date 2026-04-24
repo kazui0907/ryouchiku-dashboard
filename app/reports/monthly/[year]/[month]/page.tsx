@@ -79,7 +79,7 @@ export default function MonthlyReportPage() {
           <h1 className="text-3xl font-bold text-gray-900">
             月次レポート詳細
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-900">
             {data.year}年{data.month}月
           </p>
         </div>
@@ -96,22 +96,22 @@ export default function MonthlyReportPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                       項目
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-900 uppercase tracking-wider">
                       今月実績
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-900 uppercase tracking-wider">
                       予定数字
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-900 uppercase tracking-wider">
                       昨年実績
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-900 uppercase tracking-wider">
                       予算達成率
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-900 uppercase tracking-wider">
                       昨年対比
                     </th>
                   </tr>
@@ -340,7 +340,7 @@ export default function MonthlyReportPage() {
               <div className="text-2xl font-bold">
                 {data.budgetSales ? formatPercent(data.salesRevenue / data.budgetSales) : '—'}
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 予算 vs 実績
               </p>
             </CardContent>
@@ -356,7 +356,7 @@ export default function MonthlyReportPage() {
                   ? formatPercent(data.marginProfit / data.budgetMarginProfit)
                   : '—'}
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 予算 vs 実績
               </p>
             </CardContent>
@@ -372,7 +372,7 @@ export default function MonthlyReportPage() {
                   ? formatPercent(data.salesRevenue / data.lastYearSalesRevenue)
                   : '—'}
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 前年同月比
               </p>
             </CardContent>
@@ -386,7 +386,7 @@ export default function MonthlyReportPage() {
               <div className="text-2xl font-bold text-orange-600">
                 {data.marginProfitRate ? formatPercent(data.marginProfitRate) : '—'}
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 今月実績
               </p>
             </CardContent>

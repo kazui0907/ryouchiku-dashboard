@@ -58,9 +58,9 @@ function SummaryCard({ label, value, sub, color = 'text-gray-900' }: {
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-      <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
+      <p className="text-xs font-medium text-gray-900 mb-1">{label}</p>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-gray-900 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -119,7 +119,7 @@ export default function BalanceSheetPage() {
       {/* ヘッダー */}
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
-          <button onClick={() => router.back()} className="flex items-center text-gray-500 hover:text-gray-900">
+          <button onClick={() => router.back()} className="flex items-center text-gray-900 hover:text-gray-900">
             <ArrowLeft className="h-5 w-5 mr-1" />
             戻る
           </button>
@@ -136,9 +136,9 @@ export default function BalanceSheetPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {loading ? (
-          <div className="flex items-center justify-center h-64 text-gray-400">読み込み中...</div>
+          <div className="flex items-center justify-center h-64 text-gray-900">読み込み中...</div>
         ) : !data || chartData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-3 text-gray-400">
+          <div className="flex flex-col items-center justify-center h-64 gap-3 text-gray-900">
             <p className="text-lg">データがありません</p>
             <p className="text-sm">CSVをインポートしてください</p>
           </div>
@@ -147,7 +147,7 @@ export default function BalanceSheetPage() {
             {/* ---- 最新月サマリー ---- */}
             {l && (
               <section>
-                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
                   最新月スナップショット（{l.month}月末）
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -169,7 +169,7 @@ export default function BalanceSheetPage() {
             <section>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">資産構成の推移</h3>
-                <p className="text-xs text-gray-400 mb-4">流動資産・固定資産の積み上げ（= 総資産）</p>
+                <p className="text-xs text-gray-900 mb-4">流動資産・固定資産の積み上げ（= 総資産）</p>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
                     <defs>
@@ -200,7 +200,7 @@ export default function BalanceSheetPage() {
             <section>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">負債・純資産の構成推移</h3>
-                <p className="text-xs text-gray-400 mb-4">流動負債 + 固定負債 + 純資産 = 総資産</p>
+                <p className="text-xs text-gray-900 mb-4">流動負債 + 固定負債 + 純資産 = 総資産</p>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -220,7 +220,7 @@ export default function BalanceSheetPage() {
             <section>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">流動資産の内訳推移</h3>
-                <p className="text-xs text-gray-400 mb-4">現金預金・売上債権・棚卸資産の月次変化</p>
+                <p className="text-xs text-gray-900 mb-4">現金預金・売上債権・棚卸資産の月次変化</p>
                 <ResponsiveContainer width="100%" height={260}>
                   <AreaChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
                     <defs>
@@ -248,7 +248,7 @@ export default function BalanceSheetPage() {
 
             {/* ---- 月別詳細テーブル ---- */}
             <section>
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
                 月別詳細
               </h2>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -256,7 +256,7 @@ export default function BalanceSheetPage() {
                   <table className="min-w-full text-sm">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">月</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900">月</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-blue-600">流動資産</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-purple-600">固定資産</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">総資産</th>
@@ -264,7 +264,7 @@ export default function BalanceSheetPage() {
                         <th className="px-4 py-3 text-right text-xs font-semibold text-yellow-600">固定負債</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">負債合計</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-emerald-600">純資産</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">自己資本比率</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-900">自己資本比率</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -283,7 +283,7 @@ export default function BalanceSheetPage() {
                             <td className="px-4 py-3 text-right tabular-nums">{empty ? '—' : formatCurrency(r.fixedLiabilities!)}</td>
                             <td className="px-4 py-3 text-right tabular-nums">{empty ? '—' : formatCurrency(r.totalLiabilities!)}</td>
                             <td className="px-4 py-3 text-right tabular-nums font-medium text-emerald-700">{empty ? '—' : formatCurrency(r.netAssets!)}</td>
-                            <td className="px-4 py-3 text-right tabular-nums text-gray-500">{empty ? '—' : er}</td>
+                            <td className="px-4 py-3 text-right tabular-nums text-gray-900">{empty ? '—' : er}</td>
                           </tr>
                         );
                       })}

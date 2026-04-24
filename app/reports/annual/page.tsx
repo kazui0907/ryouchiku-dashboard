@@ -37,7 +37,7 @@ interface AnnualData {
 const YEAR_COLORS: Record<0 | 1 | 2, { line: string; label: string }> = {
   0: { line: '#2563eb', label: 'text-blue-600' },   // 当年 (濃い青)
   1: { line: '#f97316', label: 'text-orange-500' }, // -1年 (オレンジ)
-  2: { line: '#9ca3af', label: 'text-gray-400' },   // -2年 (グレー)
+  2: { line: '#9ca3af', label: 'text-gray-900' },   // -2年 (グレー)
 };
 
 // ---- ユーティリティ ----------------------------------------------------
@@ -48,7 +48,7 @@ function yoy(current: number, prev: number) {
 }
 
 function YoyBadge({ rate }: { rate: number | null }) {
-  if (rate === null) return <span className="text-gray-400 text-xs">—</span>;
+  if (rate === null) return <span className="text-gray-900 text-xs">—</span>;
   const positive = rate >= 0;
   const Icon = rate === 0 ? Minus : positive ? TrendingUp : TrendingDown;
   const color = positive ? 'text-emerald-600' : 'text-red-500';
@@ -136,7 +136,7 @@ export default function AnnualReportPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-500 hover:text-gray-900"
+            className="flex items-center text-gray-900 hover:text-gray-900"
           >
             <ArrowLeft className="h-5 w-5 mr-1" />
             戻る
@@ -156,21 +156,21 @@ export default function AnnualReportPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {loading ? (
-          <div className="flex items-center justify-center h-64 text-gray-400">読み込み中...</div>
+          <div className="flex items-center justify-center h-64 text-gray-900">読み込み中...</div>
         ) : !data ? (
-          <div className="flex items-center justify-center h-64 text-gray-400">データがありません</div>
+          <div className="flex items-center justify-center h-64 text-gray-900">データがありません</div>
         ) : (
           <>
             {/* ---- 3カ年 年次サマリーカード ---- */}
             <section>
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
                 3カ年 年次比較
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-200">
-                      <th className="text-left py-2 px-3 text-gray-500 font-medium w-36">指標</th>
+                      <th className="text-left py-2 px-3 text-gray-900 font-medium w-36">指標</th>
                       {data.years.map((y, i) => (
                         <th
                           key={y}
@@ -180,7 +180,7 @@ export default function AnnualReportPage() {
                           {y}年度{i === 0 && <span className="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">当年</span>}
                         </th>
                       ))}
-                      <th className="text-right py-2 px-4 text-gray-500 font-medium">前年比</th>
+                      <th className="text-right py-2 px-4 text-gray-900 font-medium">前年比</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -193,7 +193,7 @@ export default function AnnualReportPage() {
                         <td className="py-3 px-3 font-medium text-gray-700">{label}</td>
                         {data.annualTotals.map((t, i) => (
                           <td key={t.year} className="py-3 px-4 text-right font-mono tabular-nums">
-                            <span className={i === 0 ? 'font-bold text-gray-900' : 'text-gray-500'}>
+                            <span className={i === 0 ? 'font-bold text-gray-900' : 'text-gray-900'}>
                               {t.monthCount > 0 ? formatCurrency(t[key]) : '—'}
                             </span>
                           </td>
@@ -210,7 +210,7 @@ export default function AnnualReportPage() {
                       <td className="py-3 px-3 font-medium text-gray-700">限界利益率</td>
                       {data.annualTotals.map((t, i) => (
                         <td key={t.year} className="py-3 px-4 text-right font-mono tabular-nums">
-                          <span className={i === 0 ? 'font-bold text-gray-900' : 'text-gray-500'}>
+                          <span className={i === 0 ? 'font-bold text-gray-900' : 'text-gray-900'}>
                             {t.monthCount > 0 && t.salesRevenue > 0
                               ? formatPercent(t.marginProfit / t.salesRevenue)
                               : '—'}
@@ -235,7 +235,7 @@ export default function AnnualReportPage() {
 
             {/* ---- 3カ年グラフ 3枚 ---- */}
             <section>
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
                 月次推移 — 3カ年比較
               </h2>
               <div className="grid grid-cols-1 gap-6">
@@ -262,7 +262,7 @@ export default function AnnualReportPage() {
 
             {/* ---- 月別詳細テーブル（当年） ---- */}
             <section>
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
                 月別詳細 — {year}年度
               </h2>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -270,11 +270,11 @@ export default function AnnualReportPage() {
                   <table className="min-w-full text-sm">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">月</th>
-                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500">売上高</th>
-                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500">限界利益</th>
-                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500">限界利益率</th>
-                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500">営業利益</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold text-gray-900">月</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-900">売上高</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-900">限界利益</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-900">限界利益率</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold text-gray-900">営業利益</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">

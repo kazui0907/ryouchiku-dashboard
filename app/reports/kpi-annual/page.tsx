@@ -95,7 +95,7 @@ function KpiCell({ cell, itemName }: { cell: MonthCell; itemName: string }) {
         {fmtVal(cell.actual, itemName)}
       </div>
       {cell.target !== null && (
-        <div className="text-xs text-gray-400 leading-tight">
+        <div className="text-xs text-gray-900 leading-tight">
           {fmtVal(cell.target, itemName)}
         </div>
       )}
@@ -115,7 +115,7 @@ function AnnualCell({ cells, itemName }: { cells: MonthCell[]; itemName: string 
   return (
     <td className={`px-2 py-2 text-center font-bold ${rateBg(rate)}`}>
       <div className="text-sm text-gray-900">{fmtVal(actual, itemName)}</div>
-      {target !== null && <div className="text-xs text-gray-400">{fmtVal(target, itemName)}</div>}
+      {target !== null && <div className="text-xs text-gray-900">{fmtVal(target, itemName)}</div>}
       {rate !== null && <div className={`text-xs font-bold ${rateColor(rate)}`}>{(rate * 100).toFixed(0)}%</div>}
     </td>
   );
@@ -159,7 +159,7 @@ export default function KpiAnnualPage() {
       {/* ヘッダー */}
       <header className="bg-white border-b sticky top-0 z-20">
         <div className="max-w-full px-4 sm:px-6 py-4 flex items-center gap-4">
-          <button onClick={() => router.back()} className="flex items-center text-gray-500 hover:text-gray-900 flex-shrink-0">
+          <button onClick={() => router.back()} className="flex items-center text-gray-900 hover:text-gray-900 flex-shrink-0">
             <ArrowLeft className="h-5 w-5 mr-1" />
             戻る
           </button>
@@ -184,7 +184,7 @@ export default function KpiAnnualPage() {
               className={`px-6 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
                 tab === key
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-gray-900 hover:text-gray-700'
               }`}
             >
               {label}
@@ -195,9 +195,9 @@ export default function KpiAnnualPage() {
 
       <main className="px-2 sm:px-4 py-6">
         {loading ? (
-          <div className="flex items-center justify-center h-64 text-gray-400">読み込み中...</div>
+          <div className="flex items-center justify-center h-64 text-gray-900">読み込み中...</div>
         ) : !data ? (
-          <div className="flex items-center justify-center h-64 text-gray-400">データがありません</div>
+          <div className="flex items-center justify-center h-64 text-gray-900">データがありません</div>
         ) : tab === 'weekly' ? (
 
           /* ======= 数字KPI テーブル ======= */
@@ -218,7 +218,7 @@ export default function KpiAnnualPage() {
                       年間
                     </th>
                   </tr>
-                  <tr className="text-xs text-gray-400 bg-gray-50 border-b border-gray-200">
+                  <tr className="text-xs text-gray-900 bg-gray-50 border-b border-gray-200">
                     <td className="sticky left-0 z-10 bg-gray-50 px-4 py-1 border-r-2 border-gray-200">実績 / 目標 / 達成率</td>
                     {MONTHS.map(m => <td key={m} className="border-r border-gray-100" />)}
                     <td />
@@ -265,7 +265,7 @@ export default function KpiAnnualPage() {
                       年間
                     </th>
                   </tr>
-                  <tr className="text-xs text-gray-400 bg-gray-50 border-b border-gray-200">
+                  <tr className="text-xs text-gray-900 bg-gray-50 border-b border-gray-200">
                     <td className="sticky left-0 z-10 bg-gray-50 px-4 py-1 border-r-2 border-gray-200">実績 / 目標 / 達成率</td>
                     {MONTHS.map(m => <td key={m} className="border-r border-gray-100" />)}
                     <td />

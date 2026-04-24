@@ -55,7 +55,7 @@ function MFUploadCard({
         <FileText className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
         <div>
           <h3 className="font-semibold text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-500 mt-0.5">{description}</p>
+          <p className="text-sm text-gray-900 mt-0.5">{description}</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ function MFUploadCard({
             <option key={y} value={y}>{y}年</option>
           ))}
         </select>
-        <span className="text-xs text-gray-400">※ファイル名の日付ではなくデータが含まれる年を選択</span>
+        <span className="text-xs text-gray-900">※ファイル名の日付ではなくデータが含まれる年を選択</span>
       </div>
 
       {/* ファイル選択 */}
@@ -141,12 +141,12 @@ export default function UploadPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <button onClick={() => router.back()} className="flex items-center text-gray-500 hover:text-gray-900 mb-4">
+          <button onClick={() => router.back()} className="flex items-center text-gray-900 hover:text-gray-900 mb-4">
             <ArrowLeft className="h-5 w-5 mr-1" />
             戻る
           </button>
           <h1 className="text-2xl font-bold text-gray-900">CSVアップロード</h1>
-          <p className="mt-1 text-sm text-gray-500">マネーフォワードからエクスポートしたCSVをアップロードしてデータを更新します</p>
+          <p className="mt-1 text-sm text-gray-900">マネーフォワードからエクスポートしたCSVをアップロードしてデータを更新します</p>
         </div>
       </header>
 

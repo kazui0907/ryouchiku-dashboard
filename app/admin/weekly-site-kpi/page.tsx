@@ -316,7 +316,7 @@ export default function WeeklySiteKPIInputPage() {
                           className="px-4 py-3 text-center font-semibold text-gray-700 border-r border-gray-200 min-w-[140px]"
                         >
                           <div>第{week}週</div>
-                          {dateRange && <div className="text-xs font-normal text-gray-500">{dateRange}</div>}
+                          {dateRange && <div className="text-xs font-normal text-gray-900">{dateRange}</div>}
                         </th>
                       );
                     })}
@@ -343,7 +343,7 @@ export default function WeeklySiteKPIInputPage() {
                               const weekData = kpiData[key]?.[weekKey];
                               return (
                                 <td key={week} className="px-2 py-2 border-r border-gray-200">
-                                  <div className="text-xs text-gray-400 text-center mb-1">
+                                  <div className="text-xs text-gray-900 text-center mb-1">
                                     目標: {weekData?.target !== '' && weekData?.target !== undefined
                                       ? `${weekData.target}${isPercentItem(subItem) ? '%' : ''}`
                                       : '—'}
@@ -360,7 +360,7 @@ export default function WeeklySiteKPIInputPage() {
                                       placeholder="-"
                                     />
                                     {isPercentItem(subItem) && (
-                                      <span className="absolute right-1 text-xs text-gray-400 pointer-events-none">%</span>
+                                      <span className="absolute right-1 text-xs text-gray-900 pointer-events-none">%</span>
                                     )}
                                   </div>
                                 </td>

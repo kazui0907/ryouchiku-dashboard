@@ -31,7 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <div className="fixed bottom-2 right-3 text-xs text-gray-400 pointer-events-none select-none">
+        <div className="fixed bottom-2 right-3 text-xs text-gray-900 pointer-events-none select-none">
           Build: {BUILD_TIME} | {VERSION}
         </div>
       </body>

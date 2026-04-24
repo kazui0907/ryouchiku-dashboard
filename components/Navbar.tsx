@@ -62,7 +62,7 @@ export function Navbar() {
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
                         ? 'border-blue-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        : 'border-transparent text-gray-900 hover:border-gray-300 hover:text-gray-700'
                     }`}
                   >
                     <Icon className="h-4 w-4 mr-1" />
@@ -135,7 +135,7 @@ export function Navbar() {
           <div className="flex items-center sm:hidden">
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-gray-700 hover:bg-gray-100"
             >
               {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -168,7 +168,7 @@ export function Navbar() {
             })}
           </div>
           <div className="border-t border-gray-200 pt-2 pb-3">
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">データ管理</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-900 uppercase">データ管理</div>
             {adminNavigation.map((item) => {
               const Icon = item.icon;
               return (
@@ -185,7 +185,7 @@ export function Navbar() {
             })}
           </div>
           <div className="border-t border-gray-200 pt-2 pb-3">
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">エクスポート</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-900 uppercase">エクスポート</div>
             <button
               onClick={() => { handleExportExcel(); setShowMobileMenu(false); }}
               className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"

@@ -135,7 +135,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
               className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-colors ${
                 showEditor
                   ? 'bg-gray-100 border-gray-300 text-gray-700'
-                  : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                  : 'border-gray-200 text-gray-900 hover:bg-gray-50 hover:text-gray-700'
               }`}
             >
               <Settings className="h-4 w-4" />
@@ -151,7 +151,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
             </button>
           </div>
         </div>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-900 mt-1">
           過去3ヶ月の週次KPI・現場KPIの推移をGemini AIが分析し、経営的フィードバックを提供します
         </p>
       </CardHeader>
@@ -165,7 +165,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
                 <Settings className="h-4 w-4" />
                 分析指示文の編集
               </h3>
-              <button onClick={() => setShowEditor(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowEditor(false)} className="text-gray-900 hover:text-gray-600">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -184,7 +184,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
               {isCustomPrompt && (
                 <button
                   onClick={() => setPromptInstructions(DEFAULT_PROMPT_INSTRUCTIONS)}
-                  className="mt-1 text-xs text-gray-400 hover:text-gray-600 underline"
+                  className="mt-1 text-xs text-gray-900 hover:text-gray-600 underline"
                 >
                   デフォルトに戻す
                 </button>
@@ -215,7 +215,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
                   <Wand2 className={`h-4 w-4 ${editLoading ? 'animate-spin' : ''}`} />
                   {editLoading ? 'AIが修正中...' : 'AIに修正してもらう'}
                 </button>
-                <span className="text-xs text-gray-400">修正後は上の指示文に反映されます</span>
+                <span className="text-xs text-gray-900">修正後は上の指示文に反映されます</span>
               </div>
             </div>
 
@@ -235,17 +235,17 @@ export function AIKpiAnalysis({ year, month }: Props) {
 
         {/* 分析結果エリア */}
         {!analysis && !loading && !error && (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-10 text-gray-900">
             <Sparkles className="h-10 w-10 mb-3 opacity-30" />
             <p className="text-sm">「KPI推移を分析する」ボタンを押すと、AIによるフィードバックが表示されます</p>
           </div>
         )}
 
         {loading && (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-10 text-gray-900">
             <div className="h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3" />
             <p className="text-sm">Gemini AIがKPIデータを分析しています...</p>
-            <p className="text-xs text-gray-400 mt-1">通常10〜20秒かかります</p>
+            <p className="text-xs text-gray-900 mt-1">通常10〜20秒かかります</p>
           </div>
         )}
 
@@ -265,7 +265,7 @@ export function AIKpiAnalysis({ year, month }: Props) {
               {renderMarkdown(analysis)}
             </div>
             {generatedAt && (
-              <p className="text-xs text-gray-400 text-right mt-4 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-900 text-right mt-4 pt-3 border-t border-gray-100">
                 生成日時: {new Date(generatedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
               </p>
             )}
